@@ -77,8 +77,9 @@ int main() {
 
     while (c != 'x') {
 
-    // 1. input (non bloquant)
-#ifdef _WIN32
+    /* 1. input (non bloquant) Z Q S D pour déplacer le joueur
+    Le ifdef ne sert pas à grand chose ici, mais il est là pour montrer que la fonction kbhit() est différente selon le système d'exploitation
+    */
     if (kbhit()) {
     c = getch_portable();
     switch (c) {
@@ -87,18 +88,8 @@ int main() {
         case 'q': if (P1.x > 0)            P1.x--; break;
         case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
     }
-}
-#else
-    if (kbhit()) {
-    c = getch_portable();
-    switch (c) {
-        case 'z': if (P1.y > 0)            P1.y--; break;
-        case 's': if (P1.y < M_HEIGHT - 1) P1.y++; break;
-        case 'q': if (P1.x > 0)            P1.x--; break;
-        case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
-    }
-}
-#endif
+
+
     
     // 2. affichage
     printf("----------------------------------------------\n");
