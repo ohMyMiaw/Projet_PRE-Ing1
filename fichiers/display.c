@@ -6,7 +6,6 @@
 
 
 
-
 #ifdef _WIN32
     #include <conio.h>
     #include <windows.h>
@@ -50,7 +49,11 @@ int getch_portable() {
 
 int main() {
     char c = 0;
-
+    /* ici c était un char car x arrête le programme, mais pour les touches directionnelles, 
+    on a besoin d'un int pour contenir les codes spéciaux (ex: 1000 pour KEY_UP), d'où le changement de type de c en int
+    */
+   
+    
     enum Object{
         GANTS,
         PENSEMENT,
@@ -75,16 +78,28 @@ int main() {
     while (c != 'x') {
 
     // 1. input (non bloquant)
-    #ifdef _WIN32
-        if (kbhit()) {
-            c = getch();
-        }
-    #else
-        if (kbhit()) {
-            c = getch_portable();
-        }
-    #endif
-
+#ifdef _WIN32
+    if (kbhit()) {
+    c = getch_portable();
+    switch (c) {
+        case 'z': if (P1.y > 0)            P1.y--; break;
+        case 's': if (P1.y < M_HEIGHT - 1) P1.y++; break;
+        case 'q': if (P1.x > 0)            P1.x--; break;
+        case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
+    }
+}
+#else
+    if (kbhit()) {
+    c = getch_portable();
+    switch (c) {
+        case 'z': if (P1.y > 0)            P1.y--; break;
+        case 's': if (P1.y < M_HEIGHT - 1) P1.y++; break;
+        case 'q': if (P1.x > 0)            P1.x--; break;
+        case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
+    }
+}
+#endif
+    
     // 2. affichage
     printf("----------------------------------------------\n");
     for (int i = 0; i < M_HEIGHT; i++) {
