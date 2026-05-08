@@ -114,13 +114,13 @@ int main() {
         }
         printf("\n");
     }
-    printf("------------------------------------------\n");
+    printf("----------------------------------------------\n");
 
     // 3. pause (contrôle vitesse)
     #ifdef _WIN32
-        Sleep(1000);      // 1 s
+        Sleep(200);      // 0.2 s
     #else
-        usleep(1000000);  // 1 s
+        usleep(200000);  // 0.2 s
     #endif
 
     // 3. efface le terminal
