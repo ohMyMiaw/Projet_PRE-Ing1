@@ -103,6 +103,7 @@ int main() {
         
         break;
     }
+    }
 
 
     
@@ -145,7 +146,7 @@ int main() {
     #else
         system("clear");
     #endif
-}
+    }
 
     printf("Fin du programme.\n");
 
