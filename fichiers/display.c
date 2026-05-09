@@ -144,29 +144,6 @@ int main() {
 
     
     // 2. affichage
-    printf("----------------------------------------------\n");
-        for (int i = 0; i < M_HEIGHT; i++) {
-            printf("|");
-            for (int j = 0; j < M_WIDTH; j++) {
-                if (P1.x == j && P1.y == i) {
-                    printf(JAUNE " P " RESET "|");
-                } else {
-                    switch (grid[i][j].obj) {
-                        case GLOVES:  printf(VERT " G " RESET " |"); break;
-                        case PROBE:   printf(VERT " So" RESET " |"); break;
-                        case COTTON:  printf(VERT " Co" RESET " |"); break;
-                        case MIRROR:  printf(VERT " Mi" RESET " |"); break;
-                        case SUCTION: printf(VERT " As" RESET " |"); break;
-                        case SYRINGE: printf(VERT " Se" RESET " |"); break;
-                        case CLAMP:   printf(VERT " Pi" RESET " |"); break;
-                        case DRILL:   printf(VERT " Ro" RESET " |"); break;
-                        default:      printf("   |"); break;
-                    }
-                }
-            }
-            printf("\n");
-        }
-        printf("----------------------------------------------\n");
     // 2.1 affichage grille
     printf("----------------------------------------------\n");
     printf("|   |   | " VERT "G" "\033[0m" " | " VERT "P" "\033[0m" " | " VERT "C" "\033[0m" " |   |   |   |   |   |   |\n");
