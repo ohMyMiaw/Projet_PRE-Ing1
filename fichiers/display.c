@@ -84,7 +84,7 @@ typedef struct {
 
 
 
-int main() {
+void display() {
     char c = 0;
     /* ici c était un char car x arrête le programme, mais pour les touches directionnelles, 
     on a besoin d'un int pour contenir les codes spéciaux (ex: 1000 pour KEY_UP), d'où le changement de type de c en int
@@ -92,7 +92,7 @@ int main() {
         // Agrandir le terminal automatiquement ( sur Windows)   AYA te le met sur MAC
     #ifdef _WIN32
         system("mode con: cols=200 lines=50");
-#endif
+    #endif
 
 
 
@@ -144,6 +144,7 @@ int main() {
 
     
     // 2. affichage
+
     // 2.1 affichage grille
     printf("----------------------------------------------\n");
     printf("|   |   | " VERT "G" "\033[0m" " | " VERT "P" "\033[0m" " | " VERT "C" "\033[0m" " |   |   |   |   |   |   |\n");
@@ -166,7 +167,7 @@ int main() {
     printf("----------------------------------------------\n");
 
     //2.2 affichage infos des outils (à droite de la grille)
-    DisplayBase display1 = {2, 70};
+    DisplayBase display1 = {2, 60};
 printf("\e7");
 
 // Titre de l'affichage
@@ -206,7 +207,7 @@ printf("\e8");
 
 
 // -----------------------------------------------------------------------------------------------------------------
-    DisplayBase display2 = {1, 160}; // position de base pour l'affichage dans la cellule
+    DisplayBase display2 = {1, 100}; // position de base pour l'affichage dans la cellule
     printf("\e7"); // sauvegarde la position du curseur
     printf("\e[%d;%dH", display2.ligne++, display2.col);; // déplace le curseur à la position de la cellule
 
@@ -258,5 +259,4 @@ printf("\e8");
 #ifdef _WIN32
     system("mode con: cols=200 lines=50");
 #endif
-    return 0;
 }

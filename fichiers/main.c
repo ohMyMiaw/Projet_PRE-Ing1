@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> 
-
+#include "display.h"
+#include "save.h"
 
 #ifdef _WIN32
 
@@ -36,7 +37,8 @@ int main() {
     enum Menu {
         START,
         SAVE,
-        QUIT
+        LEADERBOARD,
+        QUIT,
     };
 
     int position = START;
@@ -55,19 +57,29 @@ int main() {
             printf("=== Menu ===\n");
             printf("1. Start <-\n");
             printf("2. Save\n");
-            printf("3. Quit\n");
+            printf("3. Leaderboard\n");
+            printf("4. Quit\n");
         }
         else if(position == SAVE){
             printf("=== Menu ===\n");
             printf("1. Start\n");
             printf("2. Save <-\n");
-            printf("3. Quit\n");
+            printf("3. Leaderboard\n");
+            printf("4. Quit\n");
+        }
+        else if(position == LEADERBOARD){
+            printf("=== Menu ===\n");
+            printf("1. Start\n");
+            printf("2. Save\n");
+            printf("3. Leaderboard <-\n");
+            printf("4. Quit\n");
         }
         else if(position == QUIT){
             printf("=== Menu ===\n");
             printf("1. Start\n");
             printf("2. Save\n");
-            printf("3. Quit <-\n");
+            printf("3. Leaderboard\n");
+            printf("4. Quit <-\n");
         }
 
         choix = getch();
@@ -78,16 +90,19 @@ int main() {
         else if(choix == 'z' && position > START){
             position--;
         }
-        else if(choix == '\r' || choix == '\n'){
+        else if(choix == ' '){
             break;
         }
     }
 
     if(position == START){
-        printf("Start selected\n");
+        display();
     }
     else if(position == SAVE){
-        printf("Save selected\n");
+        saveDisplay();
+    }
+    else if(position == LEADERBOARD){
+        printf("Leaderboard selected\n");
     }
     else if(position == QUIT){
         return 0;
