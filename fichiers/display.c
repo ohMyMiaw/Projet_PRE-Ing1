@@ -89,10 +89,22 @@ int main() {
     /* ici c était un char car x arrête le programme, mais pour les touches directionnelles, 
     on a besoin d'un int pour contenir les codes spéciaux (ex: 1000 pour KEY_UP), d'où le changement de type de c en int
     */
-        // Agrandir le terminal automatiquement ( sur Windows)   AYA te le met sur MAC
-    #ifdef _WIN32
-        system("mode con: cols=200 lines=50");
+        // Agrandir le terminal automatiquement ( sur Windows)   
+#ifdef _WIN32
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    
+    // Taille de la fenêtre
+    SMALL_RECT windowSize = {0, 0, 99, 49}; // 200 cols x 50 lignes
+    SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
+    
+    // Taille du buffer
+    COORD bufferSize = {100, 50};
+    SetConsoleScreenBufferSize(hConsole, bufferSize);
+#else
+    printf("\e[8;50;100t"); // 50 lignes x 100 colonnes
 #endif
+
+
 
 
 
@@ -166,7 +178,7 @@ int main() {
     printf("----------------------------------------------\n");
 
     //2.2 affichage infos des outils (à droite de la grille)
-    DisplayBase display1 = {2, 70};
+    DisplayBase display1 = {2, 60};
 printf("\e7");
 
 // Titre de l'affichage
@@ -206,7 +218,7 @@ printf("\e8");
 
 
 // -----------------------------------------------------------------------------------------------------------------
-    DisplayBase display2 = {1, 160}; // position de base pour l'affichage dans la cellule
+    DisplayBase display2 = {1, 100}; // position de base pour l'affichage dans la cellule
     printf("\e7"); // sauvegarde la position du curseur
     printf("\e[%d;%dH", display2.ligne++, display2.col);; // déplace le curseur à la position de la cellule
 
@@ -230,7 +242,7 @@ printf("\e8");
 
  
 
-    printf("Pour quitter, appuiez sur X \n");
+    printf("\n Pour quitter, appuiez sur X \n");
 
     
 
