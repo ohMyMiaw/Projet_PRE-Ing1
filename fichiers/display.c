@@ -1,7 +1,9 @@
 #include "display.h"
+#include "items.h"
 
 #include <stdio.h>
 #include <stdbool.h> // avoir des bool
+#include <stdlib.h>
 #include "map.h"
 // les couleurs ANSI, pour rendre le terminal plus joli
 #define ROUGE   "\033[31m" 
@@ -58,17 +60,6 @@ typedef struct {
     int col;
 } DisplayBase;
 
-enum Object{
-    GLOVES,
-    DRILL,
-    COTTON,
-    MIRROR,
-    PROBE,
-    SUCTION,
-    CLAMP,
-    SYRINGE,
-};
-
  typedef struct {
      int x;
      int y;
@@ -77,10 +68,6 @@ enum Object{
     enum Object objetId;
 } Player;
 
-
-typedef struct {
-    enum Object obj;
-} Cells;
 
 
 
