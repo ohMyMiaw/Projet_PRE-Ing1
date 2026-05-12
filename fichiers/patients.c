@@ -121,6 +121,10 @@ void displayPatience(Patient *p, int ligne, int col) {
         color = ROUGE;
 
     // Barre de progression (20 caractères)
+    printf("\e7");
+
+    // Titre de l'affichage
+    printf("\e[0;0H"); // aller en haut à gauche pour éviter d'écraser les autres affichages
     int filled = (int)(ratio * 20);
     char bar[21];
     for (int i = 0; i < 20; i++)
@@ -128,6 +132,7 @@ void displayPatience(Patient *p, int ligne, int col) {
     bar[20] = '\0';
 
     printf("\e[%d;%dH", ligne, col);
-    printf("%-15s | Patience: %s[%-20s]" RESET " %ds/%ds",
+    printf("%-15s | Patience: %s[%-20s]" RESET " %ds/%ds \n",
         p->name, color, bar, p->patienceLeft, p->patienceMax);
+    printf("\e8");
 }

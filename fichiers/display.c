@@ -105,7 +105,7 @@ void display() {
     printf("Appuie sur 'x' pour quitter.\n");
 
     while (c != 'x') {
-        PatientList patientList;
+        PatientList patientList; // initilisation de la liste de patients
         initPatients(&patientList);
         updatePatience(&patientList);  // chaque seconde
         displayPatience(&patientList.patients[0], 15, 1);  // ligne 15, col 1
@@ -161,7 +161,7 @@ void display() {
     printf("----------------------------------------------\n");
 
     //2.2 affichage infos des outils (à droite de la grille)
-    DisplayBase display1 = {2, 60};
+    DisplayBase display1 = {2, 80};
 printf("\e7");
 
 // Titre de l'affichage
@@ -201,7 +201,7 @@ printf("\e8");
 
 
 // -----------------------------------------------------------------------------------------------------------------
-    DisplayBase display2 = {1, 100}; // position de base pour l'affichage dans la cellule
+    DisplayBase display2 = {1, 120}; // position de base pour l'affichage dans la cellule
     printf("\e7"); // sauvegarde la position du curseur
     printf("\e[%d;%dH", display2.ligne++, display2.col);; // déplace le curseur à la position de la cellule
 
