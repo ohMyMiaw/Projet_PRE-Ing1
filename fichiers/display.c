@@ -1,4 +1,6 @@
 #include "display.h"
+#include "items.h"
+#include "patients.h"
 
 #include <stdio.h>
 #include <stdbool.h> // avoir des bool
@@ -71,7 +73,7 @@ typedef struct {
 
 
 
-int main() {
+void display() {
     char c = 0;
     /* ici c était un char car x arrête le programme, mais pour les touches directionnelles, 
     on a besoin d'un int pour contenir les codes spéciaux (ex: 1000 pour KEY_UP), d'où le changement de type de c en int
@@ -103,8 +105,11 @@ int main() {
     printf("Appuie sur 'x' pour quitter.\n");
 
     while (c != 'x') {
+        PatientList patientList;
+        initPatients(&patientList);
         updatePatience(&patientList);  // chaque seconde
         displayPatience(&patientList.patients[0], 15, 1);  // ligne 15, col 1
+
 
     /* 1. input (non bloquant) Z Q S D pour déplacer le joueur
     Le ifdef ne sert pas à grand chose ici, mais il est là pour montrer que la fonction kbhit() est différente selon le système d'exploitation
