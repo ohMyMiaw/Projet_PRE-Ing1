@@ -1,13 +1,15 @@
 CC = gcc
-
-SRC = display.c main.c save.c
-
+SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
-
 EXEC = jeu
 
-all:
-	$(CC) $(SRC) -o $(EXEC)
+all: $(EXEC)
+
+$(EXEC): $(OBJ)
+	$(CC) $(OBJ) -o $(EXEC)
+
+%.o: %.c
+	$(CC) -c $< -o $@
 
 clean:
-	rm -f *.o $(EXEC)
+	del /f $(OBJ) $(EXEC).exe
