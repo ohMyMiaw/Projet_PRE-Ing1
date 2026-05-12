@@ -1,7 +1,9 @@
 #include "display.h"
+#include "items.h"
 
 #include <stdio.h>
 #include <stdbool.h> // avoir des bool
+#include <stdlib.h>
 #include "map.h"
 // les couleurs ANSI, pour rendre le terminal plus joli
 #define ROUGE   "\033[31m" 
@@ -58,17 +60,6 @@ typedef struct {
     int col;
 } DisplayBase;
 
-enum Object{
-    GLOVES,
-    DRILL,
-    COTTON,
-    MIRROR,
-    PROBE,
-    SUCTION,
-    CLAMP,
-    SYRINGE,
-};
-
  typedef struct {
      int x;
      int y;
@@ -77,10 +68,6 @@ enum Object{
     enum Object objetId;
 } Player;
 
-
-typedef struct {
-    enum Object obj;
-} Cells;
 
 
 
@@ -92,7 +79,7 @@ void display() {
         // Agrandir le terminal automatiquement ( sur Windows)   AYA te le met sur MAC
     #ifdef _WIN32
         system("mode con: cols=200 lines=50");
-    #endif
+#endif
 
 
 
@@ -231,7 +218,7 @@ printf("\e8");
 
  
 
-    printf("Pour quitter, appuiez sur X \n");
+    printf("\n Pour quitter, appuiez sur X \n");
 
     
 
