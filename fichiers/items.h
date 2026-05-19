@@ -2,6 +2,7 @@
 #define ITEMS_H
 
 enum Object {
+    EMPTY=0,
     GLOVES,
     DRILL,
     COTTON,
@@ -10,6 +11,8 @@ enum Object {
     SUCTION,
     CLAMP,
     SYRINGE,
+    TRASH1,
+    TRASH2,
 };
 
 typedef struct {

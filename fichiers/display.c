@@ -86,7 +86,7 @@ void display() {
 
 
     // Initialisation de la grille et du joueur
-    Cells grid[M_HEIGHT][M_WIDTH]; // Exemple de grille 9x9
+    Cells grid[M_HEIGHT][M_WIDTH] = {0}; // Exemple de grille 9x9
     grid[0][1].obj = GLOVES; // Placer des gants à la position (0,1)
     grid[0][2].obj = PROBE; // Placer une sonde à la position (0,2)
     grid[0][3].obj = COTTON; // Placer un coton à la position (0,3)
@@ -96,6 +96,9 @@ void display() {
     grid[2][0].obj = SYRINGE; // Placer un seringue à la position (2,0)
     grid[3][0].obj = CLAMP; // Placer une pince à la position (3,0)
     grid[4][0].obj = DRILL; // Placer une roulette à la position (4,0)
+
+    grid[8][4].obj = TRASH1; // Placer une poubelle à la position (8,4)
+    grid[8][6].obj = TRASH2; // Placer une autre poubelle à la position (8,5)
 
 
     Player P1 = {4, 4, false, false, 0}; // Position initiale du joueur
@@ -129,6 +132,8 @@ void display() {
         else if (grid[P1.y][P1.x].obj == SUCTION && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = SUCTION;
         else if (grid[P1.y][P1.x].obj == DRILL && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = DRILL;
         else if (grid[P1.y][P1.x].obj == COTTON && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = COTTON;
+        else if (grid[P1.y][P1.x].obj == TRASH1) P1.hasGloves = false, P1.GlovesUsed = false;
+        else if (grid[P1.y][P1.x].obj == TRASH2) P1.hasGloves = false, P1.GlovesUsed = false;
 
         
         break;
@@ -141,9 +146,9 @@ void display() {
 
     // 2.1 affichage grille
     printf("----------------------------------------------\n");
-    printf("|   |   | " VERT "G" "\033[0m" " | " VERT "P" "\033[0m" " | " VERT "C" "\033[0m" " |   |   |   |   |   |   |\n");
+    printf("|   |   | " VERT "G" "\033[0m" " | " VERT "P" "\033[0m" " | " VERT "C" "\033[0m" " | " VERT "M" "\033[0m" " |   |   |   |   |   |\n");
     for (int i = 0; i < M_HEIGHT; i++) {
-        printf("|   |");
+        printf("| %s |", (i == 1) ? VERT "S" RESET : (i == 2) ? VERT "S" RESET : (i == 3) ? VERT "C" RESET : (i == 4) ? VERT "D" RESET : " ");
         for (int j = 0; j < M_WIDTH; j++) {
             if (P1.x == j && P1.y == i) {
                 printf(" P |");
@@ -157,11 +162,11 @@ void display() {
         printf("\n");
 
     }
-    printf("|   |   |   |   |   |   |   |   |   |   |   |\n");
+    printf("|   |   |   |   | T |   | T |   |   |   |   |\n");
     printf("----------------------------------------------\n");
 
     //2.2 affichage infos des outils (à droite de la grille)
-    DisplayBase display1 = {2, 80};
+    DisplayBase display1 = {2, 70};
 printf("\e7");
 
 // Titre de l'affichage
@@ -201,7 +206,7 @@ printf("\e8");
 
 
 // -----------------------------------------------------------------------------------------------------------------
-    DisplayBase display2 = {1, 120}; // position de base pour l'affichage dans la cellule
+    DisplayBase display2 = {1, 110}; // position de base pour l'affichage dans la cellule
     printf("\e7"); // sauvegarde la position du curseur
     printf("\e[%d;%dH", display2.ligne++, display2.col);; // déplace le curseur à la position de la cellule
 
@@ -225,7 +230,7 @@ printf("\e8");
 
  
 
-    printf("\n Pour quitter, appuiez sur X \n");
+    printf("\n \n Pour quitter, appuiez sur X \n");
 
     
 
