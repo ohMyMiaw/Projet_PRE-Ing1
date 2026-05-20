@@ -37,7 +37,6 @@ void initPatients(PatientList *list) {
     // --- Patient 1 : carie ---
     Patient p1;
     strcpy(p1.name, "Arno Ta dac");
-    p1.age = 34;
     p1.patienceMax  = 300;  // 300 secondes
     p1.patienceLeft = 300;
     p1.symptomCount = 1;
@@ -56,7 +55,6 @@ void initPatients(PatientList *list) {
     // --- Patient 2 : saignement + sensibilite ---
     Patient p2;
     strcpy(p2.name, "Aya Tikitaka");
-    p2.age = 52;
     p2.patienceMax  = 150;  // très impatiente
     p2.patienceLeft = 150;
     p2.symptomCount = 2;
@@ -79,7 +77,6 @@ void initPatients(PatientList *list) {
     // --- Patient 3 : abces ---
     Patient p3;
     strcpy(p3.name, "Fares Hamdouni");
-    p3.age = 27;
     p3.patienceMax  = 450;  // très patient
     p3.patienceLeft = 450;
     p3.symptomCount = 1;

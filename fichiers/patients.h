@@ -40,7 +40,6 @@ qui va influencer la difficulté du niveau -> le temps d'attente pour le patient
 
 typedef struct {
     char name[50];
-    int age;
     Symptom symptoms[MAX_SYMPTOMS];
     int symptomCount;
     int patienceMax;    // temps max en secondes avant que le patient parte

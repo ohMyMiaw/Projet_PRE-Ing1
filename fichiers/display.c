@@ -67,6 +67,7 @@ typedef struct {
     bool hasGloves;
     bool GlovesUsed;
     enum Object objetId;
+    bool objetInfected;
 } Player;
 
 
@@ -97,11 +98,11 @@ void display() {
     grid[3][0].obj = CLAMP; // Placer une pince à la position (3,0)
     grid[4][0].obj = DRILL; // Placer une roulette à la position (4,0)
 
-    grid[8][4].obj = TRASH1; // Placer une poubelle à la position (8,4)
-    grid[8][6].obj = TRASH2; // Placer une autre poubelle à la position (8,5)
+    grid[8][3].obj = TRASH1; // Placer une poubelle à la position (8,3)
+    grid[8][5].obj = TRASH2; // Placer une autre poubelle à la position (8,5)
 
 
-    Player P1 = {4, 4, false, false, 0}; // Position initiale du joueur
+    Player P1 = {4, 4, false, false, 0, false}; // Position initiale du joueur
 
 
     printf("Programme en cours...\n");
@@ -125,15 +126,22 @@ void display() {
         case 'q': if (P1.x > 0)            P1.x--; break;
         case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
         case ' ': if (grid[P1.y][P1.x].obj == GLOVES && !P1.hasGloves) P1.hasGloves = true, P1.GlovesUsed = false; 
-        else if (grid[P1.y][P1.x].obj == PROBE && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = PROBE;
-        else if (grid[P1.y][P1.x].obj == CLAMP && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = CLAMP;
-        else if (grid[P1.y][P1.x].obj == SYRINGE && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = SYRINGE;
-        else if (grid[P1.y][P1.x].obj == MIRROR && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = MIRROR;
-        else if (grid[P1.y][P1.x].obj == SUCTION && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = SUCTION;
-        else if (grid[P1.y][P1.x].obj == DRILL && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = DRILL;
-        else if (grid[P1.y][P1.x].obj == COTTON && !P1.GlovesUsed && P1.hasGloves && P1.objetId == 0) P1.objetId = COTTON;
-        else if (grid[P1.y][P1.x].obj == TRASH1) P1.hasGloves = false, P1.GlovesUsed = false;
-        else if (grid[P1.y][P1.x].obj == TRASH2) P1.hasGloves = false, P1.GlovesUsed = false;
+        else if (grid[P1.y][P1.x].obj == PROBE && P1.objetId == 0) {P1.objetId = PROBE;
+            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == CLAMP && P1.objetId == 0) {P1.objetId = CLAMP;
+            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objetId == 0) {P1.objetId = SYRINGE;
+            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == MIRROR && P1.objetId == 0) {P1.objetId = MIRROR;
+            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == SUCTION && P1.objetId == 0) {P1.objetId = SUCTION;
+            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == DRILL && P1.objetId == 0) {P1.objetId = DRILL;
+            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == COTTON && P1.objetId == 0) {P1.objetId = COTTON;
+            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == TRASH1) P1.hasGloves = false, P1.GlovesUsed = false, P1.objetId = 0;
+        else if (grid[P1.y][P1.x].obj == TRASH2) P1.hasGloves = false, P1.GlovesUsed = false, P1.objetId = 0;
 
         
         break;
@@ -171,35 +179,37 @@ printf("\e7");
 
 // Titre de l'affichage
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("===== OUTILS =====");
+printf("===== Tools =====");
 
 // Liste des outils verticalement avec leur état (possédé ou non, utilisé ou non)
-printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Gants       : %s", P1.hasGloves ? VERT "Oui" RESET : ROUGE "Non" RESET);
+
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Gants Utilises : %s", P1.GlovesUsed ? VERT "Oui" RESET : ROUGE "Non" RESET);
+printf("Gloves       : %s", P1.hasGloves ? VERT "Oui" RESET : ROUGE "Non" RESET);
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Miroir      : %s", P1.objetId == MIRROR  ? VERT "X" RESET : "-");
+printf("Gloves Used : %s", P1.GlovesUsed ? VERT "Oui" RESET : ROUGE "Non" RESET);
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Sonde       : %s", P1.objetId == PROBE   ? VERT "X" RESET : "-");
+printf("Probe       : %s", P1.objetId == PROBE   ? VERT "X" RESET : "-");
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Coton       : %s", P1.objetId == COTTON  ? VERT "X" RESET : "-");
+printf("Cotton      : %s", P1.objetId == COTTON  ? VERT "X" RESET : "-");
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Pince       : %s", P1.objetId == CLAMP   ? VERT "X" RESET : "-");
+printf("Mirror      : %s", P1.objetId == MIRROR  ? VERT "X" RESET : "-");
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Seringue    : %s", P1.objetId == SYRINGE ? VERT "X" RESET : "-");
+printf("Suction  : %s", P1.objetId == SUCTION ? VERT "X" RESET : "-");
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Aspirateur  : %s", P1.objetId == SUCTION ? VERT "X" RESET : "-");
+printf("Syringe    : %s", P1.objetId == SYRINGE ? VERT "X" RESET : "-");
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Roulette    : %s", P1.objetId == DRILL   ? VERT "X" RESET : "-");
+printf("Clamp       : %s", P1.objetId == CLAMP   ? VERT "X" RESET : "-");
+
+printf("\e[%d;%dH", display1.ligne++, display1.col);
+printf("Drill    : %s", P1.objetId == DRILL   ? VERT "X" RESET : "-");
 
 printf("\e8");
 // 2.3 affichage dans la cellule (à droite de la grille)
@@ -254,8 +264,4 @@ printf("\e8");
 
     printf("Fin du programme.\n");
 
-    // Agrandir le terminal automatiquement ( sur Windows)   AYA te le met sur MAC
-#ifdef _WIN32
-    system("mode con: cols=200 lines=50");
-#endif
 }
