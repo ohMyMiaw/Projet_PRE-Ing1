@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdbool.h> // avoir des bool
 #include <stdlib.h>
+#include <time.h>   // pour la fonction rand() et srand()
 #include "map.h"
 // les couleurs ANSI, pour rendre le terminal plus joli
 #define ROUGE   "\033[31m" 
@@ -71,7 +72,30 @@ typedef struct {
 } Player;
 
 
+// Remplace les déclarations AVANT le while par :
+static int chaise_patient[4] = {0, 0, 0, 0};  // 0=vide, 1=P1, 2=P2, 3=P3, 4=P4
+static int prochain_patient = 1;               // prochain patient à faire arriver (1 à 4)
+static int timer_prochain   = 50;              // secondes avant l'arrivée du prochain patient
+static bool chaise_soignee[4] = {false, false, false, false}; // true = dentiste a soigné
 
+void update_patients_salle_attente() {
+    // Si tous les patients sont arrivés, on arrête
+    if (prochain_patient > 4) return;
+
+    timer_prochain--;
+
+    if (timer_prochain <= 0) {
+        int chaise_idx = prochain_patient - 1; // P1→chaise 0, P2→chaise 1, etc.
+
+        // Le patient s'assoit sur SA chaise
+        chaise_patient[chaise_idx] = prochain_patient;
+
+        prochain_patient++;
+
+        // Attendre au moins 15 secondes avant le suivant (+ aléatoire)
+        timer_prochain = 50 + rand() % 10;
+    }
+}
 
 
 void display() {
@@ -151,6 +175,7 @@ void display() {
 
     
     // 2. affichage
+    update_patients_salle_attente();
 
     // 2.1 affichage grille
     printf("----------------------------------------------\n");
@@ -166,7 +191,18 @@ void display() {
             }
 
         }
-        printf("   |");
+        const char* noms_patients[] = {"   ", "P1", "P2", "P3", "P4"};
+        int chaise_idx = i - 1;
+        if (chaise_idx >= 0 && chaise_idx <= 3) {
+            int p = chaise_patient[chaise_idx];
+            if (p == 0)
+                printf(" " JAUNE "_" RESET " |");
+            else
+             printf(" " JAUNE "%s" RESET "|", noms_patients[p]);
+        } else {
+    printf("   |");
+        }
+
         printf("\n");
 
     }

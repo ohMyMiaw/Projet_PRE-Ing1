@@ -36,7 +36,7 @@ void initPatients(PatientList *list) {
 
     // --- Patient 1 : carie ---
     Patient p1;
-    strcpy(p1.name, "Arno Ta dac");
+    strcpy(p1.name, " Arno Ta dac");
     p1.patienceMax  = 300;  // 300 secondes
     p1.patienceLeft = 300;
     p1.symptomCount = 1;
