@@ -1,18 +1,15 @@
 #include "patients.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdbool.h>
 
-// -------------------------------------------------------
-// Couleurs ANSI
-// -------------------------------------------------------
 #define RESET   "\033[0m"
 #define ROUGE   "\033[31m"
 #define JAUNE   "\033[33m"
 #define VERT    "\033[32m"
 
-// -------------------------------------------------------
-// Noms des outils (pour affichage)
-// -------------------------------------------------------
 const char* toolName(ToolType t) {
     switch (t) {
         case TOOL_GLOVES:  return "Gants";
@@ -24,112 +21,103 @@ const char* toolName(ToolType t) {
         case TOOL_CLAMP:   return "Pince";
         case TOOL_SYRINGE: return "Seringue";
         default:           return "Inconnu";
+    } 
+}
+
+static Symptom symptomePool[] = {
+    // a changer les outils avec le plateau arno bb tu t'en occupe
+    {"Carie",               "Douleur intense dans une molaire",          {TOOL_GLOVES, TOOL_MIRROR, TOOL_PROBE, TOOL_DRILL, TOOL_COTTON}, 5, false, 0},
+    {"Saignement gencives", "Les gencives saignent au moindre contact",  {TOOL_GLOVES, TOOL_SUCTION, TOOL_COTTON},                        3, false, 0},
+    {"Sensibilite dentaire","Douleur vive au contact du froid",          {TOOL_PROBE, TOOL_SYRINGE},                                      2, false, 0},
+    {"Abces",               "Gonflement douloureux autour d'une dent",   {TOOL_GLOVES, TOOL_CLAMP, TOOL_SYRINGE, TOOL_SUCTION},           4, false, 0},
+    {"Tartre",              "Depot calcifie sur les dents",              {TOOL_GLOVES, TOOL_PROBE, TOOL_SUCTION, TOOL_COTTON},            4, false, 0},
+    {"Extraction",          "Dent a extraire d'urgence",                 {TOOL_GLOVES, TOOL_SYRINGE, TOOL_CLAMP},                         3, false, 0},
+    {"Gingivite",           "Inflammation des gencives",                 {TOOL_GLOVES, TOOL_MIRROR, TOOL_SUCTION},                        3, false, 0},
+    {"Fracture dentaire",   "Dent ebrechée suite a un choc",             {TOOL_GLOVES, TOOL_PROBE, TOOL_DRILL, TOOL_COTTON},              4, false, 0},
+};
+
+#define NB_SYMPTOMES_POOL 8
+
+static void genererSymptomesAleatoires(Patient *p) {
+    int indices[NB_SYMPTOMES_POOL];
+    for (int i = 0; i < NB_SYMPTOMES_POOL; i++) indices[i] = i;
+
+    // alogrithme de mélange de Fisher-Yates pour avoir des symptomes aléatoires à chaque lancement ( jsp ou je l'ai trouvé mais il est la )
+    for (int i = NB_SYMPTOMES_POOL - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+    }
+
+    int nb = 1 + rand() % 3; // 1 à 3 symptomes aléatoires par patient
+    p->symptomCount = nb;
+    for (int i = 0; i < nb; i++) {
+        p->symptoms[i] = symptomePool[indices[i]];
+        p->symptoms[i].soigne    = false; // remet à zéro les soins déjà appliqués
+        p->symptoms[i].toolsUsed = 0; // remet à zéro les outils déjà utilisés
     }
 }
 
-/* -------------------------------------------------------
- Initialisation des patients
-   -------------------------------------------------------
-*/
 void initPatients(PatientList *list) {
-    list->count = 0;
+    srand((unsigned int)time(NULL));
+    list->count = 4; // 1 patient par chaise dans la salle d'attente pour 4 chaises
 
-    // --- Patient 1 : carie ---
-    Patient p1;
-    strcpy(p1.name, " Arno Ta dac");
-    p1.patienceMax  = 300;  // 300 secondes
-    p1.patienceLeft = 300;
-    p1.symptomCount = 1;
+    const char *noms[4]  = {" Arno", " Aya", " Fares", " Marie"};
+    int patience[4]      = {300, 150, 450, 200}; // a changer avec la valeurs des ticks ( 300 ticks = 30 secondes par exemple )
 
-    strcpy(p1.symptoms[0].name, "Carie");
-    strcpy(p1.symptoms[0].description, "Douleur intense dans une molaire");
-    p1.symptoms[0].tools[0] = TOOL_GLOVES;
-    p1.symptoms[0].tools[1] = TOOL_MIRROR;
-    p1.symptoms[0].tools[2] = TOOL_PROBE;
-    p1.symptoms[0].tools[3] = TOOL_DRILL;
-    p1.symptoms[0].tools[4] = TOOL_COTTON;
-    p1.symptoms[0].toolCount = 5;
-
-    list->patients[list->count++] = p1;
-
-    // --- Patient 2 : saignement + sensibilite ---
-    Patient p2;
-    strcpy(p2.name, "Aya Tikitaka");
-    p2.patienceMax  = 150;  // très impatiente
-    p2.patienceLeft = 150;
-    p2.symptomCount = 2;
-
-    strcpy(p2.symptoms[0].name, "Saignement des gencives");
-    strcpy(p2.symptoms[0].description, "Les gencives saignent au moindre contact");
-    p2.symptoms[0].tools[0] = TOOL_GLOVES;
-    p2.symptoms[0].tools[1] = TOOL_SUCTION;
-    p2.symptoms[0].tools[2] = TOOL_COTTON;
-    p2.symptoms[0].toolCount = 3;
-
-    strcpy(p2.symptoms[1].name, "Sensibilite dentaire");
-    strcpy(p2.symptoms[1].description, "Douleur vive au contact du froid");
-    p2.symptoms[1].tools[0] = TOOL_PROBE;
-    p2.symptoms[1].tools[1] = TOOL_SYRINGE;
-    p2.symptoms[1].toolCount = 2;
-
-    list->patients[list->count++] = p2;
-
-    // --- Patient 3 : abces ---
-    Patient p3;
-    strcpy(p3.name, "Fares Hamdouni");
-    p3.patienceMax  = 450;  // très patient
-    p3.patienceLeft = 450;
-    p3.symptomCount = 1;
-
-    strcpy(p3.symptoms[0].name, "Abces");
-    strcpy(p3.symptoms[0].description, "Gonflement douloureux autour d'une dent");
-    p3.symptoms[0].tools[0] = TOOL_GLOVES;
-    p3.symptoms[0].tools[1] = TOOL_CLAMP;
-    p3.symptoms[0].tools[2] = TOOL_SYRINGE;
-    p3.symptoms[0].tools[3] = TOOL_SUCTION;
-    p3.symptoms[0].toolCount = 4;
-
-    list->patients[list->count++] = p3;
+    for (int i = 0; i < 4; i++) {
+        strcpy(list->patients[i].name, noms[i]);
+        list->patients[i].patienceMax  = patience[i];
+        list->patients[i].patienceLeft = patience[i];
+        list->patients[i].estSoigne    = false;
+        genererSymptomesAleatoires(&list->patients[i]);
+    }
 }
-
-// -------------------------------------------------------
-// Mise à jour du temps d'impatience (à appeler chaque seconde)
-// -------------------------------------------------------
+// changement de la patient de chacun des patients de la salle d'attente ( le patient perd de la patience chaque seconde, et si il arrive à 0, c'est perdu )
 void updatePatience(PatientList *list) {
     for (int i = 0; i < list->count; i++) {
-        if (list->patients[i].patienceLeft > 0)
+        if (!list->patients[i].estSoigne && list->patients[i].patienceLeft > 0)
             list->patients[i].patienceLeft--;
     }
 }
 
-// -------------------------------------------------------
-// Affichage de la barre de patience avec couleur ANSI aaaaaaaaaaa j'en peux plus 
-// vert (patient) → jaune → rouge (impatient)
-// -------------------------------------------------------
+bool estEntierementSoigne(Patient *p) {
+    for (int s = 0; s < p->symptomCount; s++)
+        if (!p->symptoms[s].soigne) return false;
+    return true;
+} // regarde pour chacun des symptomes du patient si il est soigné, et si un seul ne l'est pas, alors le patient n'est pas entièrement soigné
+
+bool appliquerOutil(Patient *p, ToolType outil) {
+    for (int s = 0; s < p->symptomCount; s++) {
+        Symptom *sym = &p->symptoms[s];
+        if (sym->soigne) continue;
+
+        int idx = sym->toolsUsed;
+        if (idx < sym->toolCount && sym->tools[idx] == outil) {
+            sym->toolsUsed++;
+            if (sym->toolsUsed == sym->toolCount)
+                sym->soigne = true;
+            p->estSoigne = estEntierementSoigne(p);
+            return true;
+        }
+        return false; // mauvais outil ou mauvais ordre
+    }
+    return false;
+}
+
 void displayPatience(Patient *p, int ligne, int col) {
     float ratio = (float)p->patienceLeft / (float)p->patienceMax;
+    const char *color = ratio > 0.6f ? VERT : ratio > 0.3f ? JAUNE : ROUGE;
 
-    const char *color;
-    if (ratio > 0.6f)
-        color = VERT;
-    else if (ratio > 0.3f)
-        color = JAUNE;
-    else
-        color = ROUGE;
-
-    // Barre de progression (20 caractères)
-    printf("\e7");
-
-    // Titre de l'affichage
-    printf("\e[0;0H"); // aller en haut à gauche pour éviter d'écraser les autres affichages
     int filled = (int)(ratio * 20);
     char bar[21];
-    for (int i = 0; i < 20; i++)
-        bar[i] = (i < filled) ? '#' : '-';
+    for (int i = 0; i < 20; i++) bar[i] = (i < filled) ? '#' : '-';
     bar[20] = '\0';
 
+    printf("\e7");
     printf("\e[%d;%dH", ligne, col);
-    printf("%-15s | Patience: %s[%-20s]" RESET " %ds/%ds \n",
+    printf("%-15s | Patience: %s[%-20s]" RESET " %ds/%ds  Symptomes: ",
         p->name, color, bar, p->patienceLeft, p->patienceMax);
+    for (int s = 0; s < p->symptomCount; s++)
+        printf("%s[%s]" RESET " ", p->symptoms[s].soigne ? VERT : ROUGE, p->symptoms[s].name);
     printf("\e8");
 }

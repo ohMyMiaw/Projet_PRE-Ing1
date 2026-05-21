@@ -97,6 +97,12 @@ void update_patients_salle_attente() {
     }
 }
 
+void soigner_patient(int chaise_idx) {
+    if (chaise_idx >= 0 && chaise_idx <= 3 && chaise_patient[chaise_idx] != 0) {
+        chaise_patient[chaise_idx] = 0;
+        chaise_soignee[chaise_idx] = true;
+    }
+}
 
 void display() {
     char c = 0;
@@ -131,11 +137,11 @@ void display() {
 
     printf("Programme en cours...\n");
     printf("Appuie sur 'x' pour quitter.\n");
+    PatientList patientList;
+    initPatients(&patientList);
 
     while (c != 'x') {
-        PatientList patientList; // initilisation de la liste de patients
-        initPatients(&patientList);
-        updatePatience(&patientList);  // chaque seconde
+        updatePatience(&patientList);
         displayPatience(&patientList.patients[0], 15, 1);  // ligne 15, col 1
 
 
@@ -166,6 +172,31 @@ void display() {
             if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
         else if (grid[P1.y][P1.x].obj == TRASH1) P1.hasGloves = false, P1.GlovesUsed = false, P1.objetId = 0;
         else if (grid[P1.y][P1.x].obj == TRASH2) P1.hasGloves = false, P1.GlovesUsed = false, P1.objetId = 0;
+        case 'e': {
+            int chaise_idx = P1.y - 1;
+            if (P1.x == M_WIDTH - 1 && chaise_idx >= 0 && chaise_idx <= 3
+                && chaise_patient[chaise_idx] != 0) {
+                int num_patient = chaise_patient[chaise_idx] - 1;
+                ToolType outil = TOOL_NONE;
+                switch (P1.objetId) {
+                    case GLOVES:  outil = TOOL_GLOVES;  break;
+                    case DRILL:   outil = TOOL_DRILL;   break;
+                    case COTTON:  outil = TOOL_COTTON;  break;
+                    case MIRROR:  outil = TOOL_MIRROR;  break;
+                    case PROBE:   outil = TOOL_PROBE;   break;
+                    case SUCTION: outil = TOOL_SUCTION; break;
+                    case CLAMP:   outil = TOOL_CLAMP;   break;
+                    case SYRINGE: outil = TOOL_SYRINGE; break;
+                    default: break;
+            }
+            if (outil != TOOL_NONE) {
+                bool ok = appliquerOutil(&patientList.patients[num_patient], outil);
+                if (ok && patientList.patients[num_patient].estSoigne)
+                    soigner_patient(chaise_idx);
+            }
+        }
+        break;
+    }
 
         
         break;

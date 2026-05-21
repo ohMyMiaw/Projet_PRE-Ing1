@@ -4,10 +4,12 @@
 
 #ifndef PATIENTS_H
 #define PATIENTS_H
+#include <stdbool.h>
 
+// --- Constantes arbitraires ---
 #define MAX_SYMPTOMS 3      // nombre max de symptomes par patient
-#define MAX_TOOLS    4      // nombre max d'outils par symptome
-#define MAX_PATIENTS 100
+#define MAX_TOOLS    5      // nombre max d'outils par symptome
+#define MAX_PATIENTS 4      // nombre max de patients dans la salle d'attente
 
 // --- Outils disponibles ---
 typedef enum {
@@ -24,10 +26,12 @@ typedef enum {
 
 // --- Symptome --- les symptomes qui vont donner la liste des outils à utiliser pour le patien
 typedef struct {
-    char name[50];
-    char description[200];
-    ToolType tools[MAX_TOOLS];  // liste des outils nécessaires pour soigner ce symptome
-    int toolCount;
+    char      name[50];
+    char      description[234];
+    ToolType  tools[MAX_TOOLS];
+    int       toolCount;
+    bool      soigne;
+    int       toolsUsed;
 } Symptom;
 
 /* --- Patient ---
@@ -39,11 +43,12 @@ qui va influencer la difficulté du niveau -> le temps d'attente pour le patient
 
 
 typedef struct {
-    char name[50];
+    char    name[50];
     Symptom symptoms[MAX_SYMPTOMS];
-    int symptomCount;
-    int patienceMax;    // temps max en secondes avant que le patient parte
-    int patienceLeft;   // temps restant
+    int     symptomCount;
+    int     patienceMax;
+    int     patienceLeft;
+    bool    estSoigne;
 } Patient;
 
 
@@ -53,12 +58,15 @@ typedef struct {
 
 typedef struct {
     Patient patients[MAX_PATIENTS];
-    int count;
+    int     count;
 } PatientList;
 
 // --- Fonctions ---
 void initPatients(PatientList *list);
-void updatePatience(PatientList *list);          // à appeler chaque frame
-void displayPatience(Patient *p, int ligne, int col); // affiche la barre de couleur
+void updatePatience(PatientList *list);
+void displayPatience(Patient *p, int ligne, int col); // la barre de patiente est affichée à la ligne et colonne spécifiée
+bool appliquerOutil(Patient *p, ToolType outil);
+bool estEntierementSoigne(Patient *p);
+const char* toolName(ToolType t);
 
 #endif // PATIENTS_H
