@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include "save.h"
+#include "display.h"
 #include "main.h"
 
 #ifdef _WIN32
@@ -31,6 +32,26 @@
     }
 
 #endif
+
+void saving(Player P1, char saveSlot) {
+    FILE* f = fopen("save%c.bin", "wb");
+    if (f == NULL) { printf("Error saving game\n"); return; }
+    fwrite(&P1, sizeof(Player), 1, f);
+    fclose(f);
+    printf("Game saved successfully.\n");
+}
+
+
+Player loadGame(char saveSlot) {
+    Player P1;
+    FILE* f = fopen("save%c.bin", "rb");
+    if (f == NULL) { printf("No save found\n"); return P1; }
+    fread(&P1, sizeof(Player), 1, f);
+    fclose(f);
+    printf("Game loaded successfully.\n");
+    return P1;
+}
+
 
 void saveDisplay() {
     enum Menu {
@@ -95,16 +116,27 @@ void saveDisplay() {
     }
 
     if(position == SAVE1){
-        printf("Save 1 selected\n");
+        display(loadGame(1));
     }
     else if(position == SAVE2){
-        printf("Save 2 selected\n");
+        display(loadGame(2));
     }
     else if(position == SAVE3){
-        printf("Save 3 selected\n");
+        display(loadGame(3));
     }
     else if(position == RETURN){
         main();
+    }
+}
+
+void saveGame(Player P1) {
+    // 1. gestion des entrées clavier
+    int c;
+    printf("Do you want to save the game? (1/2/3/x)\n");
+    c = getch();
+    if(c == '1'||c == '2'||c == '3') saving(P1,c);
+    else{
+        printf("Game save cancelled.\n");
     }
 
 

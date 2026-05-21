@@ -96,7 +96,8 @@ int main() {
     }
 
     if(position == START){
-        display();
+        Player P1 = {4, 4, false, false, 0, false, 500}; // Position initiale du joueur
+        display(P1);
     }
     else if(position == SAVE){
         saveDisplay();
