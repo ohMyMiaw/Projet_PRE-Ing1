@@ -13,6 +13,7 @@ enum Object {
     SYRINGE,
     TRASH1,
     TRASH2,
+    TRASH3,
 };
 
 typedef struct {

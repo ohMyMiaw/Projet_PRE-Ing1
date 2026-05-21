@@ -2,14 +2,14 @@
 
 const char* getObjectSymbol(enum Object type) {
     switch (type) {
-        case GLOVES:  return "[GL]";
-        case SYRINGE: return "[SY]";
-        case COTTON:  return "[CO]";
-        case CLAMP:   return "[CL]";
-        case DRILL:   return "[DR]";
-        case MIRROR:  return "[MI]";
-        case PROBE:   return "[PR]";
-        case SUCTION: return "[SU]";
+        case GLOVES:  return "[GLOVES]";
+        case SYRINGE: return "[SYRINGE]";
+        case COTTON:  return "[COTTON]";
+        case CLAMP:   return "[CLAMP]";
+        case DRILL:   return "[DRILL]";
+        case MIRROR:  return "[MIRROR]";
+        case PROBE:   return "[PROBE]";
+        case SUCTION: return "[SUCTION]";
         default:      return "    ";
     }
 }

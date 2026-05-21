@@ -137,20 +137,14 @@ void display(Player P1) {
     grid[3][0].obj = CLAMP; // Placer une pince à la position (3,0)
     grid[4][0].obj = DRILL; // Placer une roulette à la position (4,0)
 
-    grid[8][3].obj = TRASH1; // Placer une poubelle à la position (8,3)
-    grid[8][5].obj = TRASH2; // Placer une autre poubelle à la position (8,5)
+    grid[8][2].obj = TRASH1; // Placer une poubelle à la position (8,2)
+    grid[8][4].obj = TRASH2; // Placer une autre poubelle à la position (8,4)
+    grid[8][6].obj = TRASH3; // Placer une autre poubelle à la position (8,6)
 
 
-<<<<<<< HEAD
-    Player P1 = {4, 4, false, false, 0, false}; // Position initiale du joueur
-
-
-    printf("Programme en cours...\n");
-    printf("Appuie sur 'x' pour quitter.\n");
     PatientList patientList;
     initPatients(&patientList);
-=======
->>>>>>> 343b16e6ae7c0c4735284f58b1bdbc8587630ff2
+
 
     while (c != 'x') {
         updatePatience(&patientList);
@@ -163,43 +157,70 @@ void display(Player P1) {
     if (kbhit()) {
     c = getch_portable();
     switch (c) {
-        case 'z': if (P1.y > 0)            P1.y--; break;
-        case 's': if (P1.y < M_HEIGHT - 1) P1.y++; break;
-        case 'q': if (P1.x > 0)            P1.x--; break;
-        case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
-        case ' ': if (grid[P1.y][P1.x].obj == GLOVES && !P1.hasGloves) P1.hasGloves = true, P1.GlovesUsed = false, P1.money -= 10; 
-        else if (grid[P1.y][P1.x].obj == PROBE && P1.objetId == 0) {P1.objetId = PROBE;P1.money -= 10;
-            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == CLAMP && P1.objetId == 0) {P1.objetId = CLAMP;P1.money -= 10;
-            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objetId == 0) {P1.objetId = SYRINGE;P1.money -= 10;
-            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == MIRROR && P1.objetId == 0) {P1.objetId = MIRROR;P1.money -= 10;
-            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == SUCTION && P1.objetId == 0) {P1.objetId = SUCTION;P1.money -= 10;
-            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == DRILL && P1.objetId == 0) {P1.objetId = DRILL;P1.money -= 10;
-            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == COTTON && P1.objetId == 0) {P1.objetId = COTTON;P1.money -= 10;
-            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == TRASH1) P1.hasGloves = false, P1.GlovesUsed = false, P1.objetId = 0,P1.objetInfected = false;
-        else if (grid[P1.y][P1.x].obj == TRASH2) P1.hasGloves = false, P1.GlovesUsed = false, P1.objetId = 0;
-        case 'e': {
-            int chaise_idx = P1.y - 1;
-            if (P1.x == M_WIDTH - 1 && chaise_idx >= 0 && chaise_idx <= 3
-                && chaise_patient[chaise_idx] != 0) {
-                int num_patient = chaise_patient[chaise_idx] - 1;
-                ToolType outil = TOOL_NONE;
-                switch (P1.objetId) {
-                    case GLOVES:  outil = TOOL_GLOVES;  break;
-                    case DRILL:   outil = TOOL_DRILL;   break;
-                    case COTTON:  outil = TOOL_COTTON;  break;
-                    case MIRROR:  outil = TOOL_MIRROR;  break;
-                    case PROBE:   outil = TOOL_PROBE;   break;
-                    case SUCTION: outil = TOOL_SUCTION; break;
-                    case CLAMP:   outil = TOOL_CLAMP;   break;
-                    case SYRINGE: outil = TOOL_SYRINGE; break;
-                    default: break;
+    case 'z': if (P1.y > 0)            P1.y--; break;
+    case 's': if (P1.y < M_HEIGHT - 1) P1.y++; break;
+    case 'q': if (P1.x > 0)            P1.x--; break;
+    case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
+    case ' ':
+        if (grid[P1.y][P1.x].obj == GLOVES && P1.hasGloves == BAREHANDS) {
+            P1.hasGloves = GLOVES_CLEAN; P1.money -= 10;
+        }
+        else if (grid[P1.y][P1.x].obj == PROBE && P1.objetId == 0) {
+            P1.objetId = PROBE; P1.money -= 10;
+            if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
+        }
+        else if (grid[P1.y][P1.x].obj == CLAMP && P1.objetId == 0) {
+            P1.objetId = CLAMP; P1.money -= 10;
+            if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
+        }
+        else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objetId == 0) {
+            P1.objetId = SYRINGE; P1.money -= 10;
+            if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
+        }
+        else if (grid[P1.y][P1.x].obj == MIRROR && P1.objetId == 0) {
+            P1.objetId = MIRROR; P1.money -= 10;
+            if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
+        }
+        else if (grid[P1.y][P1.x].obj == SUCTION && P1.objetId == 0) {
+            P1.objetId = SUCTION; P1.money -= 10;
+            if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
+        }
+        else if (grid[P1.y][P1.x].obj == DRILL && P1.objetId == 0) {
+            P1.objetId = DRILL; P1.money -= 10;
+            if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
+        }
+        else if (grid[P1.y][P1.x].obj == COTTON && P1.objetId == 0) {
+            P1.objetId = COTTON; P1.money -= 10;
+            if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
+        }
+        else if (grid[P1.y][P1.x].obj == TRASH1 && P1.hasGloves == BAREHANDS) {
+            P1.objetId = 0; P1.objetInfected = false;
+        }
+        else if (grid[P1.y][P1.x].obj == TRASH2 && P1.hasGloves == GLOVES_CLEAN) {
+            P1.objetId = 0;
+        }
+        else if (grid[P1.y][P1.x].obj == TRASH3 && P1.trail == TRAIL_DIRTY) {
+            P1.trail = TRAIL_CLEAN; P1.hasGloves = BAREHANDS;
+            P1.objetId = 0; P1.objetInfected = false;
+        }
+        break;
+
+    case 'e': {
+        int chaise_idx = P1.y - 1;
+        if (P1.x == M_WIDTH - 1 && chaise_idx >= 0 && chaise_idx <= 3
+            && chaise_patient[chaise_idx] != 0) {
+            int num_patient = chaise_patient[chaise_idx] - 1;
+            ToolType outil = TOOL_NONE;
+            switch (P1.objetId) {
+                case GLOVES:  outil = TOOL_GLOVES;  break;
+                case DRILL:   outil = TOOL_DRILL;   break;
+                case COTTON:  outil = TOOL_COTTON;  break;
+                case MIRROR:  outil = TOOL_MIRROR;  break;
+                case PROBE:   outil = TOOL_PROBE;   break;
+                case SUCTION: outil = TOOL_SUCTION; break;
+                case CLAMP:   outil = TOOL_CLAMP;   break;
+                case SYRINGE: outil = TOOL_SYRINGE; break;
+                default: break;
             }
             if (outil != TOOL_NONE) {
                 bool ok = appliquerOutil(&patientList.patients[num_patient], outil);
@@ -209,39 +230,37 @@ void display(Player P1) {
         }
         break;
     }
-
-        
-        break;
-    }
-    }
-
+}
+}
 
     
     // 2. affichage
     update_patients_salle_attente();
 
     // 2.1 affichage grille
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
     printf("----------------------------------------------\n");
     printf("|   |   | " GREEN "G" "\033[0m" " | " GREEN "P" "\033[0m" " | " GREEN "C" "\033[0m" " | " GREEN "M" "\033[0m" " |   |   |   |   |   |\n");
     for (int i = 0; i < M_HEIGHT; i++) {
         printf("| %s |", (i == 1) ? GREEN "S" RESET : (i == 2) ? GREEN "S" RESET : (i == 3) ? GREEN "C" RESET : (i == 4) ? GREEN "D" RESET : " ");
         for (int j = 0; j < M_WIDTH; j++) {
             if (P1.x == j && P1.y == i) {
-                printf(" P |");
+                printf("😷 |");
             } 
             else {
             printf("   |");
             }
 
         }
-        const char* noms_patients[] = {"   ", "P1", "P2", "P3", "P4"};
+        const char* noms_patients[] = {"   ", "🤕", "🤒", "🤧", "🥶"};
         int chaise_idx = i - 1;
         if (chaise_idx >= 0 && chaise_idx <= 3) {
             int p = chaise_patient[chaise_idx];
             if (p == 0)
-                printf(" " YELLOW "_" RESET " |");
+                printf(" " YELLOW "-" RESET " |");
             else
-             printf(" " YELLOW "%s" RESET "|", noms_patients[p]);
+             printf("" YELLOW "%s" RESET " |", noms_patients[p]);
         } else {
     printf("   |");
         }
@@ -262,10 +281,10 @@ printf("===== Office =====");
 
 // Liste des outils verticalement avec leur état (possédé ou non, utilisé ou non)
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Gloves       : %s", P1.hasGloves ? GREEN "YES" RESET : RED "NO" RESET);
+printf("Gloves       : %s", P1.hasGloves == BAREHANDS ? RED "NO" RESET : GREEN "YES" RESET);
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Gloves Used  : %s", P1.GlovesUsed ? GREEN "YES" RESET : RED "NO" RESET);
+printf("Gloves Used  : %s", P1.hasGloves == GLOVES_USED ? GREEN "YES" RESET : RED "NO" RESET);
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
 printf("Dentist      : %s", getObjetSymbol(P1));
@@ -302,7 +321,7 @@ printf("\e8");
 
  
 
-    printf("\n \n Pour quitter, appuiez sur X \n");
+    printf("\n \n Press x to quit \n");
 
     
 

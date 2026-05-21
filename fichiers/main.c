@@ -160,7 +160,7 @@ int main() {
     }
 
     if(position == START){
-        Player P1 = {4, 4, false, false, 0, false, 500}; // Position initiale du joueur
+        Player P1 = {4, 4, BAREHANDS, 0, NONE, false, 500}; // Position initiale du joueur
         display(P1);
     }
     else if(position == SAVE){
