@@ -1,18 +1,19 @@
 #include "display.h"
 #include "items.h"
 #include "patients.h"
-
+#include "save.h"
 #include <stdio.h>
 #include <stdbool.h> // avoir des bool
 #include <stdlib.h>
 #include <time.h>   // pour la fonction rand() et srand()
 #include "map.h"
+
 // les couleurs ANSI, pour rendre le terminal plus joli
-#define ROUGE   "\033[31m" 
-#define VERT    "\033[32m"
-#define JAUNE   "\033[33m"
-#define BLEU    "\033[34m"
-#define RESET   "\033[0m"
+#define RED      "\033[31m" 
+#define GREEN    "\033[32m"
+#define YELLOW   "\033[33m"
+#define BLUE     "\033[34m"
+#define RESET    "\033[0m"
 
 #ifdef _WIN32
     #include <conio.h>
@@ -62,14 +63,22 @@ typedef struct {
     int col;
 } DisplayBase;
 
- typedef struct {
-     int x;
-     int y;
-    bool hasGloves;
-    bool GlovesUsed;
-    enum Object objetId;
-    bool objetInfected;
-} Player;
+
+const char* getObjetSymbol(Player P1) {
+    
+    static char buffer[64];
+    if (P1.objetId == 0) return "-";
+
+    const char* nom = getObjectSymbol(P1.objetId);
+
+    if (P1.objetInfected)
+        sprintf(buffer, RED "%s infected" RESET, nom);
+    else
+        sprintf(buffer, GREEN "%s" RESET, nom);
+
+    return buffer;
+}
+
 
 
 // Remplace les déclarations AVANT le while par :
@@ -104,7 +113,7 @@ void soigner_patient(int chaise_idx) {
     }
 }
 
-void display() {
+void display(Player P1) {
     char c = 0;
     /* ici c était un char car x arrête le programme, mais pour les touches directionnelles, 
     on a besoin d'un int pour contenir les codes spéciaux (ex: 1000 pour KEY_UP), d'où le changement de type de c en int
@@ -132,6 +141,7 @@ void display() {
     grid[8][5].obj = TRASH2; // Placer une autre poubelle à la position (8,5)
 
 
+<<<<<<< HEAD
     Player P1 = {4, 4, false, false, 0, false}; // Position initiale du joueur
 
 
@@ -139,6 +149,8 @@ void display() {
     printf("Appuie sur 'x' pour quitter.\n");
     PatientList patientList;
     initPatients(&patientList);
+=======
+>>>>>>> 343b16e6ae7c0c4735284f58b1bdbc8587630ff2
 
     while (c != 'x') {
         updatePatience(&patientList);
@@ -155,22 +167,22 @@ void display() {
         case 's': if (P1.y < M_HEIGHT - 1) P1.y++; break;
         case 'q': if (P1.x > 0)            P1.x--; break;
         case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
-        case ' ': if (grid[P1.y][P1.x].obj == GLOVES && !P1.hasGloves) P1.hasGloves = true, P1.GlovesUsed = false; 
-        else if (grid[P1.y][P1.x].obj == PROBE && P1.objetId == 0) {P1.objetId = PROBE;
-            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == CLAMP && P1.objetId == 0) {P1.objetId = CLAMP;
-            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objetId == 0) {P1.objetId = SYRINGE;
-            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == MIRROR && P1.objetId == 0) {P1.objetId = MIRROR;
-            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == SUCTION && P1.objetId == 0) {P1.objetId = SUCTION;
-            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == DRILL && P1.objetId == 0) {P1.objetId = DRILL;
-            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == COTTON && P1.objetId == 0) {P1.objetId = COTTON;
-            if(!P1.GlovesUsed && P1.hasGloves)P1.objetInfected = true;}
-        else if (grid[P1.y][P1.x].obj == TRASH1) P1.hasGloves = false, P1.GlovesUsed = false, P1.objetId = 0;
+        case ' ': if (grid[P1.y][P1.x].obj == GLOVES && !P1.hasGloves) P1.hasGloves = true, P1.GlovesUsed = false, P1.money -= 10; 
+        else if (grid[P1.y][P1.x].obj == PROBE && P1.objetId == 0) {P1.objetId = PROBE;P1.money -= 10;
+            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == CLAMP && P1.objetId == 0) {P1.objetId = CLAMP;P1.money -= 10;
+            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objetId == 0) {P1.objetId = SYRINGE;P1.money -= 10;
+            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == MIRROR && P1.objetId == 0) {P1.objetId = MIRROR;P1.money -= 10;
+            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == SUCTION && P1.objetId == 0) {P1.objetId = SUCTION;P1.money -= 10;
+            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == DRILL && P1.objetId == 0) {P1.objetId = DRILL;P1.money -= 10;
+            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == COTTON && P1.objetId == 0) {P1.objetId = COTTON;P1.money -= 10;
+            if(!P1.GlovesUsed && !P1.hasGloves)P1.objetInfected = true;}
+        else if (grid[P1.y][P1.x].obj == TRASH1) P1.hasGloves = false, P1.GlovesUsed = false, P1.objetId = 0,P1.objetInfected = false;
         else if (grid[P1.y][P1.x].obj == TRASH2) P1.hasGloves = false, P1.GlovesUsed = false, P1.objetId = 0;
         case 'e': {
             int chaise_idx = P1.y - 1;
@@ -210,9 +222,9 @@ void display() {
 
     // 2.1 affichage grille
     printf("----------------------------------------------\n");
-    printf("|   |   | " VERT "G" "\033[0m" " | " VERT "P" "\033[0m" " | " VERT "C" "\033[0m" " | " VERT "M" "\033[0m" " |   |   |   |   |   |\n");
+    printf("|   |   | " GREEN "G" "\033[0m" " | " GREEN "P" "\033[0m" " | " GREEN "C" "\033[0m" " | " GREEN "M" "\033[0m" " |   |   |   |   |   |\n");
     for (int i = 0; i < M_HEIGHT; i++) {
-        printf("| %s |", (i == 1) ? VERT "S" RESET : (i == 2) ? VERT "S" RESET : (i == 3) ? VERT "C" RESET : (i == 4) ? VERT "D" RESET : " ");
+        printf("| %s |", (i == 1) ? GREEN "S" RESET : (i == 2) ? GREEN "S" RESET : (i == 3) ? GREEN "C" RESET : (i == 4) ? GREEN "D" RESET : " ");
         for (int j = 0; j < M_WIDTH; j++) {
             if (P1.x == j && P1.y == i) {
                 printf(" P |");
@@ -227,9 +239,9 @@ void display() {
         if (chaise_idx >= 0 && chaise_idx <= 3) {
             int p = chaise_patient[chaise_idx];
             if (p == 0)
-                printf(" " JAUNE "_" RESET " |");
+                printf(" " YELLOW "_" RESET " |");
             else
-             printf(" " JAUNE "%s" RESET "|", noms_patients[p]);
+             printf(" " YELLOW "%s" RESET "|", noms_patients[p]);
         } else {
     printf("   |");
         }
@@ -246,37 +258,20 @@ printf("\e7");
 
 // Titre de l'affichage
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("===== Tools =====");
+printf("===== Office =====");
 
 // Liste des outils verticalement avec leur état (possédé ou non, utilisé ou non)
-
+printf("\e[%d;%dH", display1.ligne++, display1.col);
+printf("Gloves       : %s", P1.hasGloves ? GREEN "YES" RESET : RED "NO" RESET);
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Gloves       : %s", P1.hasGloves ? VERT "Oui" RESET : ROUGE "Non" RESET);
+printf("Gloves Used  : %s", P1.GlovesUsed ? GREEN "YES" RESET : RED "NO" RESET);
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Gloves Used : %s", P1.GlovesUsed ? VERT "Oui" RESET : ROUGE "Non" RESET);
+printf("Dentist      : %s", getObjetSymbol(P1));
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Probe       : %s", P1.objetId == PROBE   ? VERT "X" RESET : "-");
-
-printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Cotton      : %s", P1.objetId == COTTON  ? VERT "X" RESET : "-");
-
-printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Mirror      : %s", P1.objetId == MIRROR  ? VERT "X" RESET : "-");
-
-printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Suction  : %s", P1.objetId == SUCTION ? VERT "X" RESET : "-");
-
-printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Syringe    : %s", P1.objetId == SYRINGE ? VERT "X" RESET : "-");
-
-printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Clamp       : %s", P1.objetId == CLAMP   ? VERT "X" RESET : "-");
-
-printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("Drill    : %s", P1.objetId == DRILL   ? VERT "X" RESET : "-");
+printf("Money        : %d", P1.money);
 
 printf("\e8");
 // 2.3 affichage dans la cellule (à droite de la grille)
@@ -329,6 +324,6 @@ printf("\e8");
 
 
 
-    printf("Fin du programme.\n");
+    saveGame(P1);
 
 }
