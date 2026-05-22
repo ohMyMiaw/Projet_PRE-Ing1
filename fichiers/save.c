@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h> 
-#include <windows.h>
 #include "save.h"
 #include "display.h"
 #include "main.h"
@@ -8,29 +7,30 @@
 #ifdef _WIN32
 
     #include <conio.h>
+    #include <windows.h>
 
 #else
 
     #include <termios.h>
     #include <unistd.h>
 
-    char getch() {
-        struct termios oldt, newt;
-        char c;
+    //char getch() {
+    //    struct termios oldt, newt;
+    //    char c;
 
-        tcgetattr(STDIN_FILENO, &oldt);
+    //    tcgetattr(STDIN_FILENO, &oldt);
 
-        newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO);
+    //    newt = oldt;
+    //    newt.c_lflag &= ~(ICANON | ECHO);
 
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    //    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
-        c = getchar();
+    //    c = getchar();
 
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    //    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 
-        return c;
-    }
+    //    return c;
+    //} prcq c'est deja dans main.c
 
 #endif
 
@@ -52,7 +52,9 @@ Player loadGame(int saveSlot) {
     FILE* f = fopen(filename, "rb");
     if (f == NULL) { 
         printf("No save found, starting new game.\n");
-        Sleep(8000);
+        #ifdef _WIN32
+            Sleep(8000);
+        #endif
         Player P1 = {4, 4, BAREHANDS, 0, NONE, false, 500};
         return P1; 
     }

@@ -148,9 +148,12 @@ void display(Player P1) {
 
     while (c != 'x') {
         updatePatience(&patientList);
-        for (int i = 0; i < patientList.count; i++) {
-            displayPatience(&patientList.patients[i], 15 + i, 1);
-        }
+        for (int i = 0; i < 4; i++) {
+            if (chaise_patient[i] != 0) {  // affiche seulement si la chaise est occupée
+                int num_patient = chaise_patient[i] - 1;
+                displayPatience(&patientList.patients[num_patient], 15 + i, 1);
+    }
+}
 
 
     /* 1. input (non bloquant) Z Q S D pour déplacer le joueur
@@ -240,8 +243,10 @@ void display(Player P1) {
     update_patients_salle_attente();
 
     // 2.1 affichage grille
+    #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+    #endif
     printf("----------------------------------------------\n");
     printf("|   |   | " GREEN "G" "\033[0m" " | " GREEN "P" "\033[0m" " | " GREEN "C" "\033[0m" " | " GREEN "M" "\033[0m" " |   |   |   |   |   |\n");
     for (int i = 0; i < M_HEIGHT; i++) {

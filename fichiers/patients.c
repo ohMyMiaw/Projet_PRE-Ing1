@@ -12,15 +12,15 @@
 
 const char* toolName(ToolType t) {
     switch (t) {
-        case TOOL_GLOVES:  return "Gants";
-        case TOOL_DRILL:   return "Roulette";
-        case TOOL_COTTON:  return "Coton";
-        case TOOL_MIRROR:  return "Miroir";
-        case TOOL_PROBE:   return "Sonde";
-        case TOOL_SUCTION: return "Aspirateur";
-        case TOOL_CLAMP:   return "Pince";
-        case TOOL_SYRINGE: return "Seringue";
-        default:           return "Inconnu";
+        case TOOL_GLOVES:  return "Gloves";
+        case TOOL_DRILL:   return "Drill";
+        case TOOL_COTTON:  return "Cotton";
+        case TOOL_MIRROR:  return "Mirror";
+        case TOOL_PROBE:   return "Probe";
+        case TOOL_SUCTION: return "Suction";
+        case TOOL_CLAMP:   return "Clamp";
+        case TOOL_SYRINGE: return "Syringe";
+        default:           return "Unknown";
     } 
 }
 
@@ -117,7 +117,11 @@ void displayPatience(Patient *p, int ligne, int col) {
     printf("\e[%d;%dH", ligne, col);
     printf("%-15s | Patience: %s[%-20s]" RESET " %ds/%ds  Symptomes: ",
         p->name, color, bar, p->patienceLeft, p->patienceMax);
-    for (int s = 0; s < p->symptomCount; s++)
-        printf("%s[%s]" RESET " ", p->symptoms[s].soigne ? VERT : ROUGE, p->symptoms[s].name);
+    for (int s = 0; s < p->symptomCount; s++) {
+        printf("%s[%s]" RESET " -> ", p->symptoms[s].soigne ? VERT : ROUGE, p->symptoms[s].name);
+        for (int t = 0; t < p->symptoms[s].toolCount; t++) {
+            printf("%s ", toolName(p->symptoms[s].tools[t]));
+        }
+    }
     printf("\e8");
 }
