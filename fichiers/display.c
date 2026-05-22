@@ -147,7 +147,14 @@ void display(Player P1) {
 
 
     while (c != 'x') {
-        updatePatience(&patientList);
+        for (int i = 0; i < 4; i++) {
+            if (chaise_patient[i] != 0) {
+                int num = chaise_patient[i] - 1;
+                if (!patientList.patients[num].estSoigne && patientList.patients[num].patienceLeft > 0){
+                    patientList.patients[num].patienceLeft--;
+                }
+            }
+        }
         for (int i = 0; i < 4; i++) {
             if (chaise_patient[i] != 0) {  // affiche seulement si la chaise est occupée
                 int num_patient = chaise_patient[i] - 1;
@@ -304,26 +311,26 @@ printf("\e8");
 
 
 // -----------------------------------------------------------------------------------------------------------------
-    DisplayBase display2 = {1, 110}; // position de base pour l'affichage dans la cellule
-    printf("\e7"); // sauvegarde la position du curseur
-    printf("\e[%d;%dH", display2.ligne++, display2.col);; // déplace le curseur à la position de la cellule
+DisplayBase display2 = {1, 110};
+printf("\e7");
 
-    printf("----------------------------------------------\n");
-    printf("\e[%d;%dH", display2.ligne++, display2.col);;
+printf("\e[%d;%dH", display2.ligne++, display2.col);
+printf("+============ PRIX DES OUTILS ============+");
 
-    printf("|                                           |\n");
+// Tableau des outils et leurs prix
+const char* noms_outils[]  = {"Gloves ", "Probe ", "Mirror ", "Suction ", "Syringe ", "Clamp ", "Drill ", "Cotton "};
+const int   prix_outils[]  = {10,       10,      10,       10,        10,        10,      10,      10}; // prix des outils dans l'ordre
+// (remplace les prix par les vraies valeurs)
+
+for (int z = 0; z < 8; z++) {
     printf("\e[%d;%dH", display2.ligne++, display2.col);
+    printf("| %-12s :  " GREEN "%3d$" RESET "                   |", noms_outils[z], prix_outils[z]);
+}
 
-    for (int z = 0; z < M_HEIGHT; z++) {
-        printf("|                                           |\n");
-        printf("\e[%d;%dH", display2.ligne++, display2.col);
-    }
-    printf("|                                           |\n");
-    printf("\e[%d;%dH", display2.ligne++, display2.col);
-    printf("----------------------------------------------\n");
-    printf("\e[%d;%dH", display2.ligne++, display2.col);
+printf("\e[%d;%dH", display2.ligne++, display2.col);
+printf("+========================================+");
 
-    printf("\e8"); // restaure la position du curseur
+printf("\e8");
     
 
  

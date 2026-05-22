@@ -72,7 +72,7 @@ void initPatients(PatientList *list) {
         genererSymptomesAleatoires(&list->patients[i]);
     }
 }
-// changement de la patient de chacun des patients de la salle d'attente ( le patient perd de la patience chaque seconde, et si il arrive à 0, c'est perdu )
+// changement de la patience de chacun des patients de la salle d'attente ( le patient perd de la patience chaque seconde, et si il arrive à 0, c'est perdu )
 void updatePatience(PatientList *list) {
     for (int i = 0; i < list->count; i++) {
         if (!list->patients[i].estSoigne && list->patients[i].patienceLeft > 0)
