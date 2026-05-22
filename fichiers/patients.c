@@ -99,7 +99,7 @@ bool appliquerOutil(Patient *p, ToolType outil) {
             p->estSoigne = estEntierementSoigne(p);
             return true;
         }
-        return false; // mauvais outil ou mauvais ordre
+        
     }
     return false;
 }

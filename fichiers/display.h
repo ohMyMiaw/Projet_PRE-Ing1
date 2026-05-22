@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include "items.h"
 
+void display(Player P1);
+
 enum GLOVES_STATUS {
     BAREHANDS,
     GLOVES_CLEAN,
@@ -27,6 +29,6 @@ typedef struct {
     int money;
 } Player;
 
-void display(Player P1);
+
 
 #endif

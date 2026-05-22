@@ -14,6 +14,7 @@ enum Object {
     TRASH1,
     TRASH2,
     TRASH3,
+    PLATEAU,
 };
 
 typedef struct {

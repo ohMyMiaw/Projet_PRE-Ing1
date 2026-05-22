@@ -10,7 +10,7 @@
 #define MAX_SYMPTOMS 3      // nombre max de symptomes par patient
 #define MAX_TOOLS    5      // nombre max d'outils par symptome
 #define MAX_PATIENTS 4      // nombre max de patients dans la salle d'attente
-
+#define MAX_TOOLS_ON_TRAY 8 // nombre max d'outils sur le plateau du dentiste
 // --- Outils disponibles ---
 typedef enum {
     TOOL_GLOVES,
@@ -23,6 +23,17 @@ typedef enum {
     TOOL_SYRINGE,
     TOOL_NONE = -1
 } ToolType;
+
+
+
+// Plateau du dentiste, où il pose les outils pour soigner le patient
+typedef struct {
+    ToolType outils[MAX_TOOLS_ON_TRAY];
+    int      count;
+    bool     estSale;   // true après utilisation sur un patient
+    int      patientIdx; // -1 si pas assigné
+} Plateau;
+
 
 // --- Symptome --- les symptomes qui vont donner la liste des outils à utiliser pour le patien
 typedef struct {
