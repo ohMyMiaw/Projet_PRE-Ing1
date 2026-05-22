@@ -148,7 +148,9 @@ void display(Player P1) {
 
     while (c != 'x') {
         updatePatience(&patientList);
-        displayPatience(&patientList.patients[0], 15, 1);  // ligne 15, col 1
+        for (int i = 0; i < patientList.count; i++) {
+            displayPatience(&patientList.patients[i], 15 + i, 1);
+        }
 
 
     /* 1. input (non bloquant) Z Q S D pour déplacer le joueur
