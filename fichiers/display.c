@@ -100,6 +100,7 @@ static int prochain_patient = 1;               // prochain patient à faire arri
 static int timer_prochain   = 50;              // secondes avant l'arrivée du prochain patient
 static bool chaise_soignee[4] = {false, false, false, false}; // true = dentiste a soigné
 static Plateau plateau = {.count = 0, .estSale = false, .patientIdx = -1}; // plateau du dentiste, où il pose les outils pour soigner le patient
+static int patient_furieux = 0; // 0 Nombre de patient qui repartent furieux (perte de la partie à 4), 1 patient qui repart furieux (perte de la partie à 3), etc.
 
 void update_patients_salle_attente() {
     // Si tous les patients sont arrivés, on arrête
@@ -175,6 +176,10 @@ void display(Player P1) {
                 if (!patientList.patients[num].estSoigne && patientList.patients[num].patienceLeft > 0){
                     patientList.patients[num].patienceLeft--;
                 }
+                if (!patientList.patients[num].estSoigne && patientList.patients[num].patienceLeft == 0) {
+                    soigner_patient(i); // patient part furieux, sans paiement
+                    patient_furieux++;
+                }
             }
         }
         for (int i = 0; i < 4; i++) {
@@ -189,7 +194,11 @@ void display(Player P1) {
     Le ifdef ne sert pas à grand chose ici, mais il est là pour montrer que la fonction kbhit() est différente selon le système d'exploitation
     */
     if (kbhit()) {
+        
     c = getch_portable();
+    if (patient_furieux >= 3) {
+            c = 'x'; // force la sortie du while
+        }
     switch (c) {
     case 'z': if (P1.y > 0)            P1.y--; break;
     case 's': if (P1.y < M_HEIGHT - 1) P1.y++; break;
@@ -227,32 +236,67 @@ void display(Player P1) {
             P1.objetId = COTTON; P1.money -= 10;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
-        else if (grid[P1.y][P1.x].obj == TRASH1 && P1.hasGloves == BAREHANDS) { // jeter l'objet infecté
+       else if (grid[P1.y][P1.x].obj == TRASH1 && P1.objetId != 0) { // recyclage : outil propre ou contaminé
             P1.objetId = 0; P1.objetInfected = false;
         }
         else if (grid[P1.y][P1.x].obj == TRASH2) {
-            if (P1.hasGloves == GLOVES_CLEAN) P1.objetId = 0;
             if (plateau.estSale) {
                 plateau.count      = 0;
                 plateau.estSale    = false;
                 plateau.patientIdx = -1;
+                P1.objetId         = 0;
+                P1.objetInfected   = false;
+                P1.hasGloves       = BAREHANDS; // gants jetés en même temps que le plateau
             }
-        }
-        else if (grid[P1.y][P1.x].obj == TRASH3 && P1.trail == TRAIL_DIRTY) {
-            P1.trail = TRAIL_CLEAN; P1.hasGloves = BAREHANDS;
-            P1.objetId = 0; P1.objetInfected = false;
         }
         else if (grid[P1.y][P1.x].obj == PLATEAU && P1.objetId != 0 && !plateau.estSale) {
-            if (plateau.count < MAX_TOOLS_ON_TRAY) {
+            // Refuser si outil contaminé
+            if (P1.objetInfected) {
+                // outil contaminé interdit sur plateau stérile, ne rien faire
+            }
+            else if (plateau.count < MAX_TOOLS_ON_TRAY) {
                 ToolType t = objetToTool(P1.objetId);
-                if (t != TOOL_NONE) {plateau.outils[plateau.count++] = t;  }
-                P1.objetId = 0;
+                // Trouver le patient de la chaise adjacente (chaise i est à la ligne i+1)
+                int chaise_idx = P1.y - 1;
+                if (t != TOOL_NONE && chaise_idx >= 0 && chaise_idx <= 3 && chaise_patient[chaise_idx] != 0) {
+                    int num_patient = chaise_patient[chaise_idx] - 1;
+                    Patient *pat = &patientList.patients[num_patient];
+                    // Vérifier que l'outil est nécessaire pour ce patient
+                    bool outil_necessaire = false;
+                    for (int s = 0; s < pat->symptomCount; s++) {
+                        for (int ti = 0; ti < pat->symptoms[s].toolCount; ti++) {
+                            if (pat->symptoms[s].tools[ti] == t) {
+                                outil_necessaire = true;
+                                break;
+                            }
+                        }
+                    }
+                    // Vérifier que l'outil n'est pas déjà sur le plateau
+                    bool deja_present = false;
+                    for (int p = 0; p < plateau.count; p++) {
+                        if (plateau.outils[p] == t) { deja_present = true; break; }
+                    }
+                    if (outil_necessaire && !deja_present) {
+                        plateau.outils[plateau.count++] = t;
+                        P1.objetId = 0;
+                    }
+                }
             }
         }
+        
         break;
 
     case 'e': {
     int chaise_idx = P1.y - 1;
+    
+    if (P1.hasGloves != GLOVES_CLEAN) {
+        if (chaise_idx >= 0 && chaise_idx <= 3 && chaise_patient[chaise_idx] != 0) {
+            plateau.estSale = true;
+            soigner_patient(chaise_idx); // patient part furieux, sans paiement
+            patient_furieux++;
+        }
+        break;
+    }
 
     if (chaise_idx >= 0 && chaise_idx <= 3 &&
         chaise_patient[chaise_idx] != 0 &&
@@ -295,6 +339,7 @@ void display(Player P1) {
         pat->estSoigne = estEntierementSoigne(pat);
         plateau.estSale = true;
         plateau.patientIdx = num_patient;
+        P1.hasGloves = GLOVES_USED; // gants deviennent sales après le soin
 
         if (pat->estSoigne) {
             soigner_patient(chaise_idx);
@@ -384,6 +429,62 @@ if (plateau.count == 0) {
 printf("\e8");
 // 2.3 affichage dans la cellule (à droite de la grille)
 
+// 2.3 affichage des symptomes de chaque patient avec outils colorés
+DisplayBase display_patients = {20, 2};
+printf("\e7");
+
+printf("\e[%d;%dH", display_patients.ligne++, display_patients.col);
+printf("===== Patients & Symptomes =====");
+
+for (int i = 0; i < 4; i++) {
+    if (chaise_patient[i] == 0) continue; // chaise vide, on skip
+
+    int num_patient = chaise_patient[i] - 1;
+    Patient *pat = &patientList.patients[num_patient];
+
+    // Nom du patient + chaise
+    printf("\e[%d;%dH", display_patients.ligne++, display_patients.col);
+    printf(YELLOW "[ Fauteuil %d ] %s" RESET, i + 1, pat->name);
+
+    // Pour chaque symptome du patient
+    for (int s = 0; s < pat->symptomCount; s++) {
+        Symptom *sym = &pat->symptoms[s];
+
+        printf("\e[%d;%dH", display_patients.ligne++, display_patients.col);
+
+        // Nom du symptome : vert si soigné, rouge sinon
+        if (sym->soigne)
+            printf("  " GREEN "[OK] %s" RESET, sym->name);
+        else
+            printf("  " RED "[ ] %s" RESET, sym->name);
+
+        printf(" -> ");
+
+        // Outils du symptome : vert si déjà sur le plateau, blanc sinon
+        for (int t = 0; t < sym->toolCount; t++) {
+            ToolType outil = sym->tools[t];
+
+            // Vérifier si l'outil est déjà sur le plateau
+            bool sur_plateau = false;
+            for (int p = 0; p < plateau.count; p++) {
+                if (plateau.outils[p] == outil) {
+                    sur_plateau = true;
+                    break;
+                }
+            }
+
+            if (sur_plateau)
+                printf(GREEN "%s " RESET, toolName(outil)); // vert = déposé
+            else
+                printf("%s ", toolName(outil)); // blanc = manquant
+        }
+    }
+
+    // Ligne vide entre les patients
+    display_patients.ligne++;
+}
+
+printf("\e8");
 
 // -----------------------------------------------------------------------------------------------------------------
 DisplayBase display2 = {1, 110};
@@ -406,6 +507,18 @@ printf("\e[%d;%dH", display2.ligne++, display2.col);
 printf("+========================================+");
 
 printf("\e8");
+
+DisplayBase display3 = {15, 110}; // a changer pour ne pas cacher les symptomes des patients dans la salle d'attente
+printf("\e7");
+printf("\e[%d;%dH", display3.ligne++, display3.col);
+printf("+============ SCORE ============+");
+printf("\e[%d;%dH", display3.ligne++, display3.col);
+printf("| Argent : " GREEN "%5d$" RESET "           |", P1.money );
+printf("\e[%d;%dH", display3.ligne++, display3.col);
+printf("| Patients furieux : " RED "%5d" RESET "       |", patient_furieux);
+printf("\e[%d;%dH", display3.ligne++, display3.col);
+printf("+===============================+");
+
     
 
  
@@ -431,7 +544,19 @@ printf("\e8");
     }
 
 
+    // Affichage game over
+    if (patient_furieux >= 3) {
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
+        printf(RED "\n\n=== GAME OVER ===\n" RESET);
+        printf("3 patients sont partis furieux !\n");
+        printf("Score final : %d$\n\n", P1.money);
+    }
 
+    
     saveGame(P1);
 
 }

@@ -10,6 +10,10 @@
 #define JAUNE   "\033[33m"
 #define VERT    "\033[32m"
 
+
+
+
+
 const char* toolName(ToolType t) {
     switch (t) {
         case TOOL_GLOVES:  return "Gloves";
@@ -23,6 +27,7 @@ const char* toolName(ToolType t) {
         default:           return "Unknown";
     } 
 }
+
 
 static Symptom symptomePool[] = {
     // a changer les outils avec le plateau arno bb tu t'en occupe
@@ -61,11 +66,33 @@ void initPatients(PatientList *list) {
     srand((unsigned int)time(NULL));
     list->count = 4; // 1 patient par chaise dans la salle d'attente pour 4 chaises
 
-    const char *noms[4]  = {" Arno", " Aya", " Fares", " Marie"};
-    int patience[4]      = {3000, 1500, 4500, 2000}; // a changer avec la valeurs des ticks ( 300 ticks = 30 secondes par exemple )
-
+    const char *noms_pool[] = {
+        " Arno", " Aya", " Fares", " Marie", " Lucas", " Emma",
+        " Noah", " Chloe", " Liam", " Lea", " Hugo", " Camille",
+        " Louis", " Manon", " Gabriel", " Inès", " Raphael", " Jade",
+        " Arthur", " Lucie"
+    };
+    int nb_noms = 20;
+    int patience[4]; // l'impatience maximale de chaque patient (entre 800 et 4000, soit entre 13 et 67 secondes à la baisse d'une unité par seconde)
     for (int i = 0; i < 4; i++) {
-        strcpy(list->patients[i].name, noms[i]);
+        patience[i] = 100 + rand() % 1001; // a changer ici pour les test ( plus rapide)
+    }
+    for (int i = 0; i < 4; i++) {
+        // Prénom aléatoire sans doublon
+        int idx;
+        bool deja_pris;
+        do {
+            deja_pris = false;
+            idx = rand() % nb_noms;
+            for (int j = 0; j < i; j++) {
+                if (strcmp(list->patients[j].name, noms_pool[idx]) == 0) {
+                    deja_pris = true;
+                    break;
+                }
+            }
+        } while (deja_pris);
+
+        strcpy(list->patients[i].name, noms_pool[idx]);
         list->patients[i].patienceMax  = patience[i];
         list->patients[i].patienceLeft = patience[i];
         list->patients[i].estSoigne    = false;
