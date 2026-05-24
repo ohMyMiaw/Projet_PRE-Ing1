@@ -2,6 +2,7 @@
 #include <stdlib.h> 
 #include "display.h"
 #include "save.h"
+#include "patients.h"
 
 // les couleurs ANSI, pour rendre le terminal plus joli
 #define ROUGE   "\033[31m" 
@@ -162,7 +163,21 @@ int main() {
 
     if(position == START){
         Player P1 = {4, 4, BAREHANDS, 0, NONE, false, 500}; // Position initiale du joueur
-        display(P1);
+        int chaise_patient[4] = {0, 0, 0, 0};  // 0=vide, 1=P1, 2=P2, 3=P3, 4=P4
+        int prochain_patient = 1;               // prochain patient à faire arriver (1 à 4)
+        int timer_prochain   = 50;              // secondes avant l'arrivée du prochain patient
+        bool chaise_soignee[4] = {false, false, false, false}; // true = dentiste a soigné
+        Plateau plateaux[4] = {
+            {.count = 0, .estSale = false, .patientIdx = -1},
+            {.count = 0, .estSale = false, .patientIdx = -1},
+            {.count = 0, .estSale = false, .patientIdx = -1},
+            {.count = 0, .estSale = false, .patientIdx = -1},
+        };
+        // plateau du dentiste, où il pose les outils pour soigner le patient
+        int patient_furieux = 0; // 0 Nombre de patient qui repartent furieux (perte de la partie à 4), 1 patient qui repart furieux (perte de la partie à 3), etc.
+        PatientList patientList;
+        initPatients(&patientList);
+        display(P1, patientList, prochain_patient, chaise_patient, timer_prochain, chaise_soignee, plateaux, patient_furieux);
     }
     else if(position == SAVE){
         saveDisplay();
