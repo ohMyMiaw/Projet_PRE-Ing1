@@ -169,13 +169,14 @@ void display(Player P1) {
     grid[3][0].obj = CLAMP; // Placer une pince à la position (3,0)
     grid[4][0].obj = DRILL; // Placer une roulette à la position (4,0)
 
-    grid[6][2].obj = TRASH1; // Placer une poubelle à la position (8,2)
-    grid[6][4].obj = TRASH2; // Placer une autre poubelle à la position (8,4)
+    grid[8][2].obj = TRASH1; // Placer une poubelle à la position (8,2)
+    grid[8][4].obj = TRASH2; // Placer une autre poubelle à la position (8,4)
+    grid[8][6].obj = TRASH3; // Placer une autre poubelle à la position (8,6)
 
-    grid[1][6].obj = PLATEAU; // Placer le plateau du dentiste à la position (1,8)
-    grid[2][6].obj = PLATEAU; // Placer le plateau du dentiste à la position (2,8)
-    grid[3][6].obj = PLATEAU; // Placer le plateau du dentiste à la position (3,8)
-    grid[4][6].obj = PLATEAU; // Placer le plateau du dentiste à la position (4,8)
+    grid[1][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (1,8)
+    grid[2][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (2,8)
+    grid[3][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (3,8)
+    grid[4][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (4,8)
 
 
 
@@ -384,9 +385,9 @@ void display(Player P1) {
     SetConsoleCP(CP_UTF8);
     #endif
     printf("----------------------------------------------\n");
-    printf("|   |   |" GREEN "GL" "\033[0m" " |" GREEN "PR" "\033[0m" " |" GREEN "CO" "\033[0m" " |" GREEN "MI" "\033[0m" " |   |   |   |\n");
+    printf("|   |   | " GREEN "G" "\033[0m" " | " GREEN "P" "\033[0m" " | " GREEN "C" "\033[0m" " | " GREEN "M" "\033[0m" " |   |   |   |   |   |\n");
     for (int i = 0; i < M_HEIGHT; i++) {
-        printf("|%s |", (i == 1) ? GREEN "SY" RESET : (i == 2) ? GREEN "SU" RESET : (i == 3) ? GREEN "CL" RESET : (i == 4) ? GREEN "DR" RESET : "  ");
+        printf("| %s |", (i == 1) ? GREEN "S" RESET : (i == 2) ? GREEN "S" RESET : (i == 3) ? GREEN "C" RESET : (i == 4) ? GREEN "D" RESET : " ");
         for (int j = 0; j < M_WIDTH; j++) {
             if (P1.x == j && P1.y == i) {
                 printf("😷 |");
@@ -414,7 +415,7 @@ void display(Player P1) {
         printf("\n");
 
     }
-    printf("|   |   |   |T1 |   |T2 |   |   |   |\n");
+    printf("|   |   |   |T1 |   |T2 |   |T3 |   |   |   |\n");
     printf("----------------------------------------------\n");
 
     //2.2 affichage infos des outils (à droite de la grille)

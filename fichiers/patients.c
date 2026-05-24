@@ -34,14 +34,14 @@ const char* toolName(ToolType t) {
 
 static Symptom symptomePool[] = {
     // a changer les outils avec le plateau arno bb tu t'en occupe
-    {"Carie",               "Douleur intense dans une molaire",          {TOOL_GLOVES, TOOL_MIRROR, TOOL_PROBE, TOOL_DRILL, TOOL_COTTON}, 5, false, 0},
-    {"Saignement gencives", "Les gencives saignent au moindre contact",  {TOOL_GLOVES, TOOL_SUCTION, TOOL_COTTON},                        3, false, 0},
+    {"Carie",               "Douleur intense dans une molaire",          {TOOL_MIRROR, TOOL_PROBE, TOOL_DRILL, TOOL_COTTON}, 4, false, 0},
+    {"Saignement gencives", "Les gencives saignent au moindre contact",  {TOOL_SUCTION, TOOL_COTTON},                        2, false, 0},
     {"Sensibilite dentaire","Douleur vive au contact du froid",          {TOOL_PROBE, TOOL_SYRINGE},                                      2, false, 0},
-    {"Abces",               "Gonflement douloureux autour d'une dent",   {TOOL_GLOVES, TOOL_CLAMP, TOOL_SYRINGE, TOOL_SUCTION},           4, false, 0},
-    {"Tartre",              "Depot calcifie sur les dents",              {TOOL_GLOVES, TOOL_PROBE, TOOL_SUCTION, TOOL_COTTON},            4, false, 0},
-    {"Extraction",          "Dent a extraire d'urgence",                 {TOOL_GLOVES, TOOL_SYRINGE, TOOL_CLAMP},                         3, false, 0},
-    {"Gingivite",           "Inflammation des gencives",                 {TOOL_GLOVES, TOOL_MIRROR, TOOL_SUCTION},                        3, false, 0},
-    {"Fracture dentaire",   "Dent ebrechée suite a un choc",             {TOOL_GLOVES, TOOL_PROBE, TOOL_DRILL, TOOL_COTTON},              4, false, 0},
+    {"Abces",               "Gonflement douloureux autour d'une dent",   {TOOL_CLAMP, TOOL_SYRINGE, TOOL_SUCTION},           3, false, 0},
+    {"Tartre",              "Depot calcifie sur les dents",              {TOOL_PROBE, TOOL_SUCTION, TOOL_COTTON},            3, false, 0},
+    {"Extraction",          "Dent a extraire d'urgence",                 {TOOL_SYRINGE, TOOL_CLAMP},                         2, false, 0},
+    {"Gingivite",           "Inflammation des gencives",                 {TOOL_MIRROR, TOOL_SUCTION},                        2, false, 0},
+    {"Fracture dentaire",   "Dent ebrechée suite a un choc",             {TOOL_PROBE, TOOL_DRILL, TOOL_COTTON},              3, false, 0},
 };
 
 #define NB_SYMPTOMES_POOL 8
