@@ -24,7 +24,7 @@ typedef enum {
     TOOL_NONE = -1
 } ToolType;
 
-
+ 
 
 // Plateau du dentiste, où il pose les outils pour soigner le patient
 typedef struct {

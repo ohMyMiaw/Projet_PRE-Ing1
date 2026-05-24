@@ -169,14 +169,13 @@ void display(Player P1) {
     grid[3][0].obj = CLAMP; // Placer une pince à la position (3,0)
     grid[4][0].obj = DRILL; // Placer une roulette à la position (4,0)
 
-    grid[8][2].obj = TRASH1; // Placer une poubelle à la position (8,2)
-    grid[8][4].obj = TRASH2; // Placer une autre poubelle à la position (8,4)
-    grid[8][6].obj = TRASH3; // Placer une autre poubelle à la position (8,6)
+    grid[6][2].obj = TRASH1; // Placer une poubelle à la position (8,2)
+    grid[6][4].obj = TRASH2; // Placer une autre poubelle à la position (8,4)
 
-    grid[1][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (1,8)
-    grid[2][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (2,8)
-    grid[3][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (3,8)
-    grid[4][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (4,8)
+    grid[1][6].obj = PLATEAU; // Placer le plateau du dentiste à la position (1,8)
+    grid[2][6].obj = PLATEAU; // Placer le plateau du dentiste à la position (2,8)
+    grid[3][6].obj = PLATEAU; // Placer le plateau du dentiste à la position (3,8)
+    grid[4][6].obj = PLATEAU; // Placer le plateau du dentiste à la position (4,8)
 
 
 
@@ -199,12 +198,15 @@ void display(Player P1) {
                 }
             }
         }
-        for (int i = 0; i < 4; i++) {
-            if (chaise_patient[i] != 0) {  // affiche seulement si la chaise est occupée
-                int num_patient = chaise_patient[i] - 1;
-                displayPatience(&patientList.patients[num_patient], 15 + i, 1);
-            }
-        }
+        // les prix des outils, à utiliser dans le display pour afficher le prix de chaque outil et dans le main pour retirer l'argent du joueur quand il ramasse un outil
+        int GLOVE_PRICE = 2;
+        int PROBE_PRICE = 10;
+        int MIRROR_PRICE = 15;
+        int SUCTION_PRICE = 15;
+        int SYRINGE_PRICE = 20;
+        int CLAMP_PRICE = 20;
+        int DRILL_PRICE = 10;
+        int COTTON_PRICE = 30;
 
 
     /* 1. input (non bloquant) Z Q S D pour déplacer le joueur
@@ -223,34 +225,34 @@ void display(Player P1) {
     case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
     case ' ':
         if (grid[P1.y][P1.x].obj == GLOVES && P1.hasGloves == BAREHANDS) { // ramasser les gants seulement si on n'en a pas déjà
-            P1.hasGloves = GLOVES_CLEAN; P1.money -= 10;
+            P1.hasGloves = GLOVES_CLEAN; P1.money -= GLOVE_PRICE;
         }
         else if (grid[P1.y][P1.x].obj == PROBE && P1.objetId == 0) { // ramasser la sonde seulement si on n'en a pas déjà
-            P1.objetId = PROBE; P1.money -= 10;
+            P1.objetId = PROBE; P1.money -= PROBE_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == CLAMP && P1.objetId == 0) { // ramasser la pince seulement si on n'en a pas déjà
-            P1.objetId = CLAMP; P1.money -= 10;
+            P1.objetId = CLAMP; P1.money -= CLAMP_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objetId == 0) { // ramasser la seringue seulement si on n'en a pas déjà
-            P1.objetId = SYRINGE; P1.money -= 10;
+            P1.objetId = SYRINGE; P1.money -= SYRINGE_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == MIRROR && P1.objetId == 0) { // ramasser le miroir seulement si on n'en a pas déjà
-            P1.objetId = MIRROR; P1.money -= 10;
+            P1.objetId = MIRROR; P1.money -= MIRROR_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == SUCTION && P1.objetId == 0) { // ramasser l'extracteur de salive seulement si on n'en a pas déjà
-            P1.objetId = SUCTION; P1.money -= 10;
+            P1.objetId = SUCTION; P1.money -= SUCTION_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == DRILL && P1.objetId == 0) { // ramasser la roulette seulement si on n'en a pas déjà
-            P1.objetId = DRILL; P1.money -= 10;
+            P1.objetId = DRILL; P1.money -= DRILL_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == COTTON && P1.objetId == 0) { // ramasser le coton seulement si on n'en a pas déjà
-            P1.objetId = COTTON; P1.money -= 10;
+            P1.objetId = COTTON; P1.money -= COTTON_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
        else if (grid[P1.y][P1.x].obj == TRASH1 && P1.objetId != 0) { // recyclage : outil propre ou contaminé
@@ -382,9 +384,9 @@ void display(Player P1) {
     SetConsoleCP(CP_UTF8);
     #endif
     printf("----------------------------------------------\n");
-    printf("|   |   | " GREEN "G" "\033[0m" " | " GREEN "P" "\033[0m" " | " GREEN "C" "\033[0m" " | " GREEN "M" "\033[0m" " |   |   |   |   |   |\n");
+    printf("|   |   |" GREEN "GL" "\033[0m" " |" GREEN "PR" "\033[0m" " |" GREEN "CO" "\033[0m" " |" GREEN "MI" "\033[0m" " |   |   |   |\n");
     for (int i = 0; i < M_HEIGHT; i++) {
-        printf("| %s |", (i == 1) ? GREEN "S" RESET : (i == 2) ? GREEN "S" RESET : (i == 3) ? GREEN "C" RESET : (i == 4) ? GREEN "D" RESET : " ");
+        printf("|%s |", (i == 1) ? GREEN "SY" RESET : (i == 2) ? GREEN "SU" RESET : (i == 3) ? GREEN "CL" RESET : (i == 4) ? GREEN "DR" RESET : "  ");
         for (int j = 0; j < M_WIDTH; j++) {
             if (P1.x == j && P1.y == i) {
                 printf("😷 |");
@@ -412,18 +414,16 @@ void display(Player P1) {
         printf("\n");
 
     }
-    printf("|   |   |   |T1 |   |T2 |   |T3 |   |   |   |\n");
+    printf("|   |   |   |T1 |   |T2 |   |   |   |\n");
     printf("----------------------------------------------\n");
 
     //2.2 affichage infos des outils (à droite de la grille)
-    DisplayBase display1 = {2, 70};
-printf("\e7");
 
-// Titre de l'affichage
+printf("\e7");
+DisplayBase display1 = {1, 50};
 printf("\e[%d;%dH", display1.ligne++, display1.col);
 printf("===== Office =====");
 
-// Liste des outils verticalement avec leur état (possédé ou non, utilisé ou non)
 printf("\e[%d;%dH", display1.ligne++, display1.col);
 printf("Gloves       : %s", P1.hasGloves == BAREHANDS ? RED "NO" RESET : GREEN "YES" RESET);
 
@@ -453,10 +453,9 @@ for (int i = 0; i < 4; i++) {
 }
 
 printf("\e8");
-// 2.3 affichage dans la cellule (à droite de la grille)
 
 // 2.3 affichage des symptomes de chaque patient avec outils colorés
-DisplayBase display_patients = {20, 2};
+DisplayBase display_patients = {15, 2};
 printf("\e7");
 
 printf("\e[%d;%dH", display_patients.ligne++, display_patients.col);
@@ -468,9 +467,27 @@ for (int i = 0; i < 4; i++) {
     int num_patient = chaise_patient[i] - 1;
     Patient *pat = &patientList.patients[num_patient];
 
-    printf("\e[%d;%dH", display_patients.ligne++, display_patients.col);
-    printf(YELLOW "[ Fauteuil %d ] %s" RESET, i + 1, pat->name);
+    // Couleur selon la patience restante
+    float ratio = (float)pat->patienceLeft / (float)pat->patienceMax;
+    const char *color_patience = ratio > 0.6f ? GREEN : ratio > 0.3f ? YELLOW : RED;
 
+    // Nom + patience + plateau
+    printf("\e[%d;%dH", display_patients.ligne++, display_patients.col);
+    printf(YELLOW "[ F%d ] %s" RESET " | Patience: %s%d/%d" RESET " | Plateau: %s",
+           i + 1, pat->name,
+           color_patience, pat->patienceLeft, pat->patienceMax,
+           plateaux[i].estSale ? RED "SALE" RESET : GREEN "PROPRE" RESET);
+
+    // Outils sur le plateau
+    if (plateaux[i].count == 0) {
+        printf(" (vide)");
+    } else {
+        for (int t = 0; t < plateaux[i].count; t++) {
+            printf(" " GREEN "%s" RESET, toolName(plateaux[i].outils[t]));
+        }
+    }
+
+    // Symptomes
     for (int s = 0; s < pat->symptomCount; s++) {
         Symptom *sym = &pat->symptoms[s];
 
@@ -485,7 +502,6 @@ for (int i = 0; i < 4; i++) {
 
         for (int t = 0; t < sym->toolCount; t++) {
             ToolType outil = sym->tools[t];
-
             bool sur_plateau = false;
             for (int p = 0; p < plateaux[i].count; p++) {
                 if (plateaux[i].outils[p] == outil) {
@@ -493,7 +509,6 @@ for (int i = 0; i < 4; i++) {
                     break;
                 }
             }
-
             if (sur_plateau)
                 printf(GREEN "%s " RESET, toolName(outil));
             else
@@ -505,6 +520,9 @@ for (int i = 0; i < 4; i++) {
 }
 
 printf("\e8");
+// 2.3 affichage dans la cellule (à droite de la grille)
+
+// 2.3 affichage des symptomes de chaque patient avec outils colorés
 
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -516,7 +534,7 @@ printf("+============ PRIX DES OUTILS ============+");
 
 // Tableau des outils et leurs prix
 const char* noms_outils[]  = {"Gloves ", "Probe ", "Mirror ", "Suction ", "Syringe ", "Clamp ", "Drill ", "Cotton "};
-const int   prix_outils[]  = {10,       10,      10,       10,        10,        10,      10,      10}; // prix des outils dans l'ordre
+const int   prix_outils[]  = {2,       10,      15,       15,        20,        10,      10,      30}; // prix des outils dans l'ordre
 // (remplace les prix par les vraies valeurs)
 
 for (int z = 0; z < 8; z++) {
@@ -534,18 +552,24 @@ printf("\e7");
 printf("\e[%d;%dH", display3.ligne++, display3.col);
 printf("+============ SCORE ============+");
 printf("\e[%d;%dH", display3.ligne++, display3.col);
-printf("| Argent : " GREEN "%5d$" RESET "           |", P1.money );
+printf("| Argent Gagné : " GREEN "%5d$" RESET "           |", 500 - (P1.money ));
 printf("\e[%d;%dH", display3.ligne++, display3.col);
 printf("| Patients furieux : " RED "%5d" RESET "       |", patient_furieux);
 printf("\e[%d;%dH", display3.ligne++, display3.col);
 printf("+===============================+");
 
-    
+printf("\e8");
 
- 
 
-    printf("\n \n \n \n \n \n Press x to quit \n");
-
+    printf("\e7");
+    DisplayBase display4 = {30, 110};
+    printf("\e[%d;%dH", display4.ligne++, display4.col);
+    printf("+============ QUIT ============+");
+    printf("\e[%d;%dH", display4.ligne++, display4.col);
+    printf("|       Press x to quit        |");
+    printf("\e[%d;%dH", display4.ligne++, display4.col);
+    printf("+==============================+");
+    printf("\e8");
     
 
 
