@@ -28,6 +28,9 @@ const char* toolName(ToolType t) {
     } 
 }
 
+  
+
+
 
 static Symptom symptomePool[] = {
     // a changer les outils avec le plateau arno bb tu t'en occupe
@@ -75,7 +78,7 @@ void initPatients(PatientList *list) {
     int nb_noms = 20;
     int patience[4]; // l'impatience maximale de chaque patient (entre 800 et 4000, soit entre 13 et 67 secondes à la baisse d'une unité par seconde)
     for (int i = 0; i < 4; i++) {
-        patience[i] = 100 + rand() % 1001; // a changer ici pour les test ( plus rapide)
+        patience[i] = 8000 + rand() % 3000; // a changer ici pour les test ( plus rapide)
     }
     for (int i = 0; i < 4; i++) {
         // Prénom aléatoire sans doublon
