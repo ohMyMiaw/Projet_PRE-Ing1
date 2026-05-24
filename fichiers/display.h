@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include "items.h"
 
-void display(Player P1);
 
 enum GLOVES_STATUS {
     BAREHANDS,
@@ -28,6 +27,9 @@ typedef struct {
     bool objetInfected;
     int money;
 } Player;
+
+
+void display(Player P1);
 
 
 

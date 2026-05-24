@@ -62,7 +62,7 @@ void initPatients(PatientList *list) {
     list->count = 4; // 1 patient par chaise dans la salle d'attente pour 4 chaises
 
     const char *noms[4]  = {" Arno", " Aya", " Fares", " Marie"};
-    int patience[4]      = {300, 150, 450, 200}; // a changer avec la valeurs des ticks ( 300 ticks = 30 secondes par exemple )
+    int patience[4]      = {3000, 1500, 4500, 2000}; // a changer avec la valeurs des ticks ( 300 ticks = 30 secondes par exemple )
 
     for (int i = 0; i < 4; i++) {
         strcpy(list->patients[i].name, noms[i]);
@@ -118,6 +118,7 @@ void displayPatience(Patient *p, int ligne, int col) {
     printf("%-15s | Patience: %s[%-20s]" RESET " %ds/%ds  Symptomes: ",
         p->name, color, bar, p->patienceLeft, p->patienceMax);
     for (int s = 0; s < p->symptomCount; s++) {
+        if (p->symptoms[s].soigne) continue;
         printf("%s[%s]" RESET " -> ", p->symptoms[s].soigne ? VERT : ROUGE, p->symptoms[s].name);
         for (int t = 0; t < p->symptoms[s].toolCount; t++) {
             printf("%s ", toolName(p->symptoms[s].tools[t]));

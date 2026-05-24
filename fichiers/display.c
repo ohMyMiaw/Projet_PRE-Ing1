@@ -1,12 +1,13 @@
-#include "display.h"
-#include "items.h"
-#include "patients.h"
-#include "save.h"
 #include <stdio.h>
 #include <stdbool.h> // avoir des bool
 #include <stdlib.h>
 #include <time.h>   // pour la fonction rand() et srand()
 #include "map.h"
+#include "display.h"
+#include "items.h"
+#include "patients.h"
+#include "save.h"
+
 
 // les couleurs ANSI, pour rendre le terminal plus joli
 #define RED      "\033[31m" 
@@ -154,7 +155,11 @@ void display(Player P1) {
     grid[8][4].obj = TRASH2; // Placer une autre poubelle à la position (8,4)
     grid[8][6].obj = TRASH3; // Placer une autre poubelle à la position (8,6)
 
-    grid[6][4].obj = PLATEAU; // Placer le plateau du dentiste à la position (6,4)
+    grid[1][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (1,8)
+    grid[2][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (2,8)
+    grid[3][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (3,8)
+    grid[4][8].obj = PLATEAU; // Placer le plateau du dentiste à la position (4,8)
+
 
 
     PatientList patientList;
@@ -176,8 +181,8 @@ void display(Player P1) {
             if (chaise_patient[i] != 0) {  // affiche seulement si la chaise est occupée
                 int num_patient = chaise_patient[i] - 1;
                 displayPatience(&patientList.patients[num_patient], 15 + i, 1);
-    }
-}
+            }
+        }
 
 
     /* 1. input (non bloquant) Z Q S D pour déplacer le joueur
@@ -191,38 +196,38 @@ void display(Player P1) {
     case 'q': if (P1.x > 0)            P1.x--; break;
     case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
     case ' ':
-        if (grid[P1.y][P1.x].obj == GLOVES && P1.hasGloves == BAREHANDS) {
+        if (grid[P1.y][P1.x].obj == GLOVES && P1.hasGloves == BAREHANDS) { // ramasser les gants seulement si on n'en a pas déjà
             P1.hasGloves = GLOVES_CLEAN; P1.money -= 10;
         }
-        else if (grid[P1.y][P1.x].obj == PROBE && P1.objetId == 0) {
+        else if (grid[P1.y][P1.x].obj == PROBE && P1.objetId == 0) { // ramasser la sonde seulement si on n'en a pas déjà
             P1.objetId = PROBE; P1.money -= 10;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
-        else if (grid[P1.y][P1.x].obj == CLAMP && P1.objetId == 0) {
+        else if (grid[P1.y][P1.x].obj == CLAMP && P1.objetId == 0) { // ramasser la pince seulement si on n'en a pas déjà
             P1.objetId = CLAMP; P1.money -= 10;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
-        else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objetId == 0) {
+        else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objetId == 0) { // ramasser la seringue seulement si on n'en a pas déjà
             P1.objetId = SYRINGE; P1.money -= 10;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
-        else if (grid[P1.y][P1.x].obj == MIRROR && P1.objetId == 0) {
+        else if (grid[P1.y][P1.x].obj == MIRROR && P1.objetId == 0) { // ramasser le miroir seulement si on n'en a pas déjà
             P1.objetId = MIRROR; P1.money -= 10;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
-        else if (grid[P1.y][P1.x].obj == SUCTION && P1.objetId == 0) {
+        else if (grid[P1.y][P1.x].obj == SUCTION && P1.objetId == 0) { // ramasser l'extracteur de salive seulement si on n'en a pas déjà
             P1.objetId = SUCTION; P1.money -= 10;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
-        else if (grid[P1.y][P1.x].obj == DRILL && P1.objetId == 0) {
+        else if (grid[P1.y][P1.x].obj == DRILL && P1.objetId == 0) { // ramasser la roulette seulement si on n'en a pas déjà
             P1.objetId = DRILL; P1.money -= 10;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
-        else if (grid[P1.y][P1.x].obj == COTTON && P1.objetId == 0) {
+        else if (grid[P1.y][P1.x].obj == COTTON && P1.objetId == 0) { // ramasser le coton seulement si on n'en a pas déjà
             P1.objetId = COTTON; P1.money -= 10;
             if (P1.hasGloves == BAREHANDS) P1.objetInfected = true;
         }
-        else if (grid[P1.y][P1.x].obj == TRASH1 && P1.hasGloves == BAREHANDS) {
+        else if (grid[P1.y][P1.x].obj == TRASH1 && P1.hasGloves == BAREHANDS) { // jeter l'objet infecté
             P1.objetId = 0; P1.objetInfected = false;
         }
         else if (grid[P1.y][P1.x].obj == TRASH2) {
@@ -248,23 +253,57 @@ void display(Player P1) {
 
     case 'e': {
     int chaise_idx = P1.y - 1;
-    if (P1.x == M_WIDTH - 1 && chaise_idx >= 0 && chaise_idx <= 3 && chaise_patient[chaise_idx] != 0 && plateau.count > 0 && !plateau.estSale) {    
-        int num_patient = chaise_patient[chaise_idx] - 1;
 
-        for (int t = 0; t < plateau.count; t++) {
-            appliquerOutil(&patientList.patients[num_patient], plateau.outils[t]);
+    if (chaise_idx >= 0 && chaise_idx <= 3 &&
+        chaise_patient[chaise_idx] != 0 &&
+        plateau.count > 0 &&
+        !plateau.estSale) {
+
+        int num_patient = chaise_patient[chaise_idx] - 1;
+        Patient *pat = &patientList.patients[num_patient];
+
+        for (int s = 0; s < pat->symptomCount; s++) {
+            Symptom *sym = &pat->symptoms[s];
+
+            if (sym->soigne)
+                continue;
+
+            bool tous_presents = true;
+
+            for (int t = 0; t < sym->toolCount; t++) {
+                bool trouve = false;
+
+                for (int p = 0; p < plateau.count; p++) {
+                    if (plateau.outils[p] == sym->tools[t]) {
+                        trouve = true;
+                        break;
+                    }
+                }
+
+                if (!trouve) {
+                    tous_presents = false;
+                    break;
+                }
+            }
+
+            if (tous_presents) {
+                sym->soigne = true;
+                sym->toolsUsed = sym->toolCount;
+            }
         }
 
+        pat->estSoigne = estEntierementSoigne(pat);
         plateau.estSale = true;
-        plateau.patientIdx = num_patient;  // ← manquait
+        plateau.patientIdx = num_patient;
 
-        if (patientList.patients[num_patient].estSoigne)
+        if (pat->estSoigne) {
             soigner_patient(chaise_idx);
+        }
     }
     break;
-}
-}
-}
+    }
+    }
+    }
 
     
     // 2. affichage
@@ -284,7 +323,7 @@ void display(Player P1) {
                 printf("😷 |");
             } 
             else if (grid[i][j].obj == PLATEAU) {
-                printf("🫙 |");
+                printf("🫙  |");
             }
             else {
                 printf("   |");
@@ -306,7 +345,7 @@ void display(Player P1) {
         printf("\n");
 
     }
-    printf("|   |   |   |   | T |   | T |   |   |   |   |\n");
+    printf("|   |   |   |T1 |   |T2 |   |T3 |   |   |   |\n");
     printf("----------------------------------------------\n");
 
     //2.2 affichage infos des outils (à droite de la grille)
@@ -371,7 +410,7 @@ printf("\e8");
 
  
 
-    printf("\n \n Press x to quit \n");
+    printf("\n \n \n \n \n \n Press x to quit \n");
 
     
 
