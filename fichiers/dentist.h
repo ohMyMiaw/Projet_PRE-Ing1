@@ -5,12 +5,22 @@
 #include "items.h"
 #include "patients.h"
 
+// Prix des outils
+#define GLOVE_PRICE   2
+#define PROBE_PRICE   10
+#define MIRROR_PRICE  15
+#define SUCTION_PRICE 15
+#define SYRINGE_PRICE 20
+#define CLAMP_PRICE   20
+#define DRILL_PRICE   10
+#define COTTON_PRICE  30
+
 
 enum GLOVES_STATUS {
     BAREHANDS,
     GLOVES_CLEAN,
     GLOVES_USED,
-};
+}; // l'état des gants du joueur, qui va influencer la propreté des outils ramassés et donc le soin des patients
 
 enum TRAIL {
     NONE,
@@ -18,7 +28,7 @@ enum TRAIL {
     TRAIL_DIRTY,
 };
 
-
+// Les infos générale du joueur
 typedef struct {
     int x;
     int y;

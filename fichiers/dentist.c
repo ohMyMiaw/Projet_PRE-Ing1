@@ -7,15 +7,6 @@
 #define GREEN  "\033[32m"
 #define RESET  "\033[0m"
 
-// Prix des outils
-#define GLOVE_PRICE   2
-#define PROBE_PRICE   10
-#define MIRROR_PRICE  15
-#define SUCTION_PRICE 15
-#define SYRINGE_PRICE 20
-#define CLAMP_PRICE   20
-#define DRILL_PRICE   10
-#define COTTON_PRICE  30
 
 ToolType objectToTool(enum Object obj) {
     switch (obj) {
@@ -35,48 +26,49 @@ ToolType objectToTool(enum Object obj) {
 void action_pick_up(Player *P1, Cells grid[M_HEIGHT][M_WIDTH], Tray tray[4],
                     int chair_patient[4], PatientList *patientList) {
 
-    if (grid[P1->y][P1->x].obj == GLOVES && P1->hasGloves == BAREHANDS) {
+    if (grid[P1->y][P1->x].obj == GLOVES && P1->hasGloves == BAREHANDS && P1->money >= GLOVE_PRICE) {
         P1->hasGloves = GLOVES_CLEAN;
         P1->money -= GLOVE_PRICE;
         P1->moneySpent += GLOVE_PRICE;
     }
-    else if (grid[P1->y][P1->x].obj == PROBE && P1->objectId == 0) {
+    else if (grid[P1->y][P1->x].obj == PROBE && P1->objectId == 0 && P1->money >= PROBE_PRICE) {
         P1->objectId = PROBE;
         P1->money -= PROBE_PRICE;
         P1->moneySpent += PROBE_PRICE;
         if (P1->hasGloves == BAREHANDS) P1->objectInfected = true;
+        // Ramasse si il n'a pas déjà un objet, sinon ne fait rien
     }
-    else if (grid[P1->y][P1->x].obj == CLAMP && P1->objectId == 0) {
+    else if (grid[P1->y][P1->x].obj == CLAMP && P1->objectId == 0 && P1->money >= CLAMP_PRICE) {
         P1->objectId = CLAMP;
         P1->money -= CLAMP_PRICE;
         P1->moneySpent += CLAMP_PRICE;
         if (P1->hasGloves == BAREHANDS) P1->objectInfected = true;
     }
-    else if (grid[P1->y][P1->x].obj == SYRINGE && P1->objectId == 0) {
+    else if (grid[P1->y][P1->x].obj == SYRINGE && P1->objectId == 0 && P1->money >= SYRINGE_PRICE) {
         P1->objectId = SYRINGE;
         P1->money -= SYRINGE_PRICE;
         P1->moneySpent += SYRINGE_PRICE;
         if (P1->hasGloves == BAREHANDS) P1->objectInfected = true;
     }
-    else if (grid[P1->y][P1->x].obj == MIRROR && P1->objectId == 0) {
+    else if (grid[P1->y][P1->x].obj == MIRROR && P1->objectId == 0 && P1->money >= MIRROR_PRICE) {
         P1->objectId = MIRROR;
         P1->money -= MIRROR_PRICE;
         P1->moneySpent += MIRROR_PRICE;
         if (P1->hasGloves == BAREHANDS) P1->objectInfected = true;
     }
-    else if (grid[P1->y][P1->x].obj == SUCTION && P1->objectId == 0) {
+    else if (grid[P1->y][P1->x].obj == SUCTION && P1->objectId == 0 && P1->money >= SUCTION_PRICE) {
         P1->objectId = SUCTION;
         P1->money -= SUCTION_PRICE;
         P1->moneySpent += SUCTION_PRICE;
         if (P1->hasGloves == BAREHANDS) P1->objectInfected = true;
     }
-    else if (grid[P1->y][P1->x].obj == DRILL && P1->objectId == 0) {
+    else if (grid[P1->y][P1->x].obj == DRILL && P1->objectId == 0 && P1->money >= DRILL_PRICE) {
         P1->objectId = DRILL;
         P1->money -= DRILL_PRICE;
         P1->moneySpent += DRILL_PRICE;
         if (P1->hasGloves == BAREHANDS) P1->objectInfected = true;
     }
-    else if (grid[P1->y][P1->x].obj == COTTON && P1->objectId == 0) {
+    else if (grid[P1->y][P1->x].obj == COTTON && P1->objectId == 0 && P1->money >= COTTON_PRICE) {
         P1->objectId = COTTON;
         P1->money -= COTTON_PRICE;
         P1->moneySpent += COTTON_PRICE;
@@ -85,7 +77,7 @@ void action_pick_up(Player *P1, Cells grid[M_HEIGHT][M_WIDTH], Tray tray[4],
     else if (grid[P1->y][P1->x].obj == TRASH1 && P1->objectId != 0) {
         P1->objectId = 0;
         P1->objectInfected = false;
-    }
+    } // Enlève l'objet dans la main du joueur, mais ne nettoie pas les gants sales (si il les a)
     else if (grid[P1->y][P1->x].obj == TRASH2) {
         for (int i = 0; i < 4; i++) {
             if (tray[i].isDirty) {
@@ -99,7 +91,8 @@ void action_pick_up(Player *P1, Cells grid[M_HEIGHT][M_WIDTH], Tray tray[4],
                 break;
             }
         }
-    }
+    } // Nettoie le plateau sale, et remet à zéro l'objet dans la main du joueur (au cas où il aurait jeté des gants sales dessus)
+
     else if (grid[P1->y][P1->x].obj == TRAY && P1->objectId != 0) {
         int chair_idx = P1->y - 1;
         if (chair_idx >= 0 && chair_idx <= 3 && !tray[chair_idx].isDirty && !P1->objectInfected) {
@@ -123,10 +116,10 @@ void action_pick_up(Player *P1, Cells grid[M_HEIGHT][M_WIDTH], Tray tray[4],
                 }
             }
         }
-    }
+    } // Dépose les objets sur les plateaux 
 }
 
-// Gère la touche E : soigner le patient
+// Gère la touche 'e' : soigner le patient
 void action_interact(Player *P1, Cells grid[M_HEIGHT][M_WIDTH], Tray tray[4],
                      int chair_patient[4], PatientList *patientList, bool neat_chair[4],
                      int *furious_patient, int *unsatisfied_patient, int *satisfied_patient) {
@@ -147,6 +140,7 @@ void action_interact(Player *P1, Cells grid[M_HEIGHT][M_WIDTH], Tray tray[4],
     if (chair_patient[chair_idx] == 0) return;
     if (tray[chair_idx].count == 0)    return;
     if (tray[chair_idx].isDirty)       return;
+
 
     Patient *pat = &patientList->patients[chair_idx];
 
@@ -171,7 +165,8 @@ void action_interact(Player *P1, Cells grid[M_HEIGHT][M_WIDTH], Tray tray[4],
     tray[chair_idx].isDirty    = true;
     tray[chair_idx].patientIdx = chair_idx;
     P1->hasGloves = GLOVES_USED;
-
+    
+    // Gère le départ du patient soigné
     if (pat->isTreated) {
         chair_patient[chair_idx] = 0;
         neat_chair[chair_idx]    = true;
@@ -180,6 +175,6 @@ void action_interact(Player *P1, Cells grid[M_HEIGHT][M_WIDTH], Tray tray[4],
         if      (ratio > 0.6f) { payment = 200; (*satisfied_patient)++;   }
         else if (ratio > 0.3f) { payment = 100; (*unsatisfied_patient)++; }
         else                   { payment = 50;  (*unsatisfied_patient)++; }
-        P1->money += payment;
+        P1->money += payment; // Paye en fonction de la patience restante du patient
     }
 }

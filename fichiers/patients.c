@@ -131,7 +131,7 @@ bool applyTool(Patient *p, ToolType tool) {
     }
     return false;
 }
-
+// Affichage du temps de patience restant par patient
 void displayPatience(Patient *p, int row, int col) {
     float ratio = (float)p->patienceLeft / (float)p->patienceMax;
     const char *color = ratio > 0.6f ? GREEN : ratio > 0.3f ? YELLOW : RED;
@@ -157,7 +157,7 @@ void displayPatience(Patient *p, int row, int col) {
 
 
 
-
+// Gère l'arrivée des patients dans la salle d'attente : un patient arrive toutes les 150 secondes, mais ce timer est accéléré si il y a des chaises libres
 void update_patients_waiting_room(int *next_patient, int chair_patient[4],
                                    int *next_timer, Tray tray[4], PatientList *patientList) {
     int free_chairs = 0;

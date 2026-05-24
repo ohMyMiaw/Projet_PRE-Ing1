@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -g
-SRC = fichiers/display.c fichiers/items.c fichiers/patients.c fichiers/map.c fichiers/dentist.c fichiers/save.c fichiers/main.c
+SRC = fichiers/display.c fichiers/items.c fichiers/patients.c fichiers/dentist.c fichiers/save.c fichiers/main.c
 TARGET = game
 
 all: $(TARGET)

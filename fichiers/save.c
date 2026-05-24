@@ -14,26 +14,9 @@
     #include <termios.h>
     #include <unistd.h>
 
-    //char getch() {
-    //    struct termios oldt, newt;
-    //    char c;
-
-    //    tcgetattr(STDIN_FILENO, &oldt);
-
-    //    newt = oldt;
-    //    newt.c_lflag &= ~(ICANON | ECHO);
-
-    //    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
-    //    c = getchar();
-
-    //    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-
-    //    return c;
-    //} prcq c'est deja dans main.c
 
 #endif
-
+//------------------------------------------------------------ ECRITURE D'UNE SAVE ------------------------------------------------------------
 void saving(GameState gameState, int saveSlot) {
     char filename[20];
     sprintf(filename, "save%d.bin", saveSlot);
@@ -44,6 +27,7 @@ void saving(GameState gameState, int saveSlot) {
     printf("Game saved successfully.\n");
 }
 
+//------------------------------------------------------------ APPEL DES INFOS ------------------------------------------------------------
 GameState loadGame(int saveSlot) {
     GameState state;
     // valeurs par défaut
@@ -78,7 +62,7 @@ GameState loadGame(int saveSlot) {
     return state;
 }
 
-
+//------------------------------------------------------------ MENU SAVE ------------------------------------------------------------
 void saveDisplay() {
     enum Menu {
         SAVE1,
@@ -154,6 +138,8 @@ void saveDisplay() {
     }
 }
 
+
+//------------------------------------------------------------ SAUVEGARDER OU NON ------------------------------------------------------------
 void saveGame(GameState gameState) {
     // 1. gestion des entrées clavier
     int c;
