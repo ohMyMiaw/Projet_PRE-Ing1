@@ -7,6 +7,7 @@
 #include "items.h"
 #include "patients.h"
 #include "save.h"
+#include "dentist.h"
 
 
 // les couleurs ANSI, pour rendre le terminal plus joli
@@ -91,20 +92,6 @@ const char* getDentistToolSymbol(Player P1) {
     return buffer;
 }
 
-ToolType objectToTool(enum Object obj) {
-    switch (obj) {
-        case GLOVES:  return TOOL_GLOVES;
-        case DRILL:   return TOOL_DRILL;
-        case COTTON:  return TOOL_COTTON;
-        case MIRROR:  return TOOL_MIRROR;
-        case PROBE:   return TOOL_PROBE;
-        case SUCTION: return TOOL_SUCTION;
-        case CLAMP:   return TOOL_CLAMP;
-        case SYRINGE: return TOOL_SYRINGE;
-        default:      return TOOL_NONE;
-    }
-}
-
 
 
 
@@ -164,15 +151,6 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
                 }
             }
         }
-        // les prix des tools, à utiliser dans le display pour afficher le prix de chaque tool et dans le main pour retirer l'argent du joueur quand il ramasse un tool
-        int GLOVE_PRICE = 2;
-        int PROBE_PRICE = 10;
-        int MIRROR_PRICE = 15;
-        int SUCTION_PRICE = 15;
-        int SYRINGE_PRICE = 20;
-        int CLAMP_PRICE = 20;
-        int DRILL_PRICE = 10;
-        int COTTON_PRICE = 30;
 
 
     /* 1. input (non bloquant) Z Q S D pour déplacer le joueur
@@ -190,164 +168,13 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
     case 'q': if (P1.x > 0)            P1.x--; break;
     case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
     case ' ':
-        if (grid[P1.y][P1.x].obj == GLOVES && P1.hasGloves == BAREHANDS) { // ramasser les gants seulement si on n'en a pas déjà
-            P1.hasGloves = GLOVES_CLEAN; P1.money -= GLOVE_PRICE; P1.moneySpent += GLOVE_PRICE;
-        }
-        else if (grid[P1.y][P1.x].obj == PROBE && P1.objectId == 0) { // ramasser la sonde seulement si on n'en a pas déjà
-            P1.objectId = PROBE; P1.money -= PROBE_PRICE; P1.moneySpent += PROBE_PRICE;
-            if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
-        }
-        else if (grid[P1.y][P1.x].obj == CLAMP && P1.objectId == 0) { // ramasser la pince seulement si on n'en a pas déjà
-            P1.objectId = CLAMP; P1.money -= CLAMP_PRICE; P1.moneySpent += CLAMP_PRICE;
-            if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
-        }
-        else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objectId == 0) { // ramasser la seringue seulement si on n'en a pas déjà
-            P1.objectId = SYRINGE; P1.money -= SYRINGE_PRICE; P1.moneySpent += SYRINGE_PRICE;
-            if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
-        }
-        else if (grid[P1.y][P1.x].obj == MIRROR && P1.objectId == 0) { // ramasser le miroir seulement si on n'en a pas déjà
-            P1.objectId = MIRROR; P1.money -= MIRROR_PRICE; P1.moneySpent += MIRROR_PRICE;
-            if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
-        }
-        else if (grid[P1.y][P1.x].obj == SUCTION && P1.objectId == 0) { // ramasser l'extracteur de salive seulement si on n'en a pas déjà
-            P1.objectId = SUCTION; P1.money -= SUCTION_PRICE; P1.moneySpent += SUCTION_PRICE;
-            if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
-        }
-        else if (grid[P1.y][P1.x].obj == DRILL && P1.objectId == 0) { // ramasser la roulette seulement si on n'en a pas déjà
-            P1.objectId = DRILL; P1.money -= DRILL_PRICE; P1.moneySpent += DRILL_PRICE;
-            if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
-        }
-        else if (grid[P1.y][P1.x].obj == COTTON && P1.objectId == 0) { // ramasser le coton seulement si on n'en a pas déjà
-            P1.objectId = COTTON; P1.money -= COTTON_PRICE;P1.moneySpent += COTTON_PRICE;
-            if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
-        }
-       else if (grid[P1.y][P1.x].obj == TRASH1 && P1.objectId != 0) { // recyclage : tool propre ou contaminé
-            P1.objectId = 0; P1.objectInfected = false;
-        }
-        else if (grid[P1.y][P1.x].obj == TRASH2) {
-    // vider le plateau sale le plus proche (celui du patient soigné)
-            for (int i = 0; i < 4; i++) {
-                if (tray[i].isDirty) {
-                    tray[i].count      = 0;
-                    tray[i].isDirty    = false;
-                    tray[i].patientIdx = -1;
-                    P1.objectId             = 0;
-                    P1.objectInfected       = false;
-                    P1.hasGloves           = BAREHANDS;
-                    break; // un seul à la fois
-                }
-            }
-        }
-
-        else if (grid[P1.y][P1.x].obj == TRAY && P1.objectId != 0) {
-            int chair_idx = P1.y - 1;
-            if (chair_idx >= 0 && chair_idx <= 3 && !tray[chair_idx].isDirty) {
-                if (P1.objectInfected) {
-                    // tool contaminé interdit sur plateau stérile, ne rien faire
-                }
-                else if (tray[chair_idx].count < MAX_TOOLS_ON_TRAY) {
-                    ToolType t = objectToTool(P1.objectId);
-                    if (t != TOOL_NONE && chair_patient[chair_idx] != 0) {
-                        int num_patient = chair_patient[chair_idx] - 1;
-                        Patient *pat = &patientList.patients[num_patient];
-                        // Vérifier que l'tool est nécessaire pour ce patient
-                        bool tool_needed = false;
-                        for (int s = 0; s < pat->symptomCount; s++) {
-                            for (int ti = 0; ti < pat->symptoms[s].toolCount; ti++) {
-                                if (pat->symptoms[s].tools[ti] == t) {
-                                    tool_needed = true;
-                                    break;
-                                }
-                            }
-                        }
-                        // Vérifier que l'tool n'est pas déjà sur le plateau
-                        bool already_present = false;
-                        for (int p = 0; p < tray[chair_idx].count; p++) {
-                            if (tray[chair_idx].tools[p] == t) { already_present = true; break; }
-                        }
-                        if (tool_needed && !already_present) {
-                            tray[chair_idx].tools[tray[chair_idx].count++] = t;
-                            P1.objectId = 0;
-                        }
-                    }
-                }
-            }
-        }
-        
+        action_pick_up(&P1, grid, tray, chair_patient, &patientList);
         break;
 
     case 'e': {
-    int chair_idx = P1.y - 1;
-    
-    if (P1.hasGloves != GLOVES_CLEAN) {
-        if (chair_idx >= 0 && chair_idx <= 3 && chair_patient[chair_idx] != 0) {
-            tray[chair_idx].isDirty = true;
-            treat_patient(chair_idx, chair_patient, neat_chair); // patient part furieux, sans paiement
-            furious_patient++;
-        }
+    action_interact(&P1, grid, tray, chair_patient, &patientList,
+                    neat_chair, &furious_patient, &unsatisfied_patient, &satisfied_patient);
         break;
-    }
-
-    if (chair_idx >= 0 && chair_idx <= 3 &&
-        chair_patient[chair_idx] != 0 &&
-        tray[chair_idx].count > 0 &&
-        !tray[chair_idx].isDirty) {
- 
-        int num_patient = chair_patient[chair_idx] - 1;
-        Patient *pat = &patientList.patients[num_patient];
- 
-        for (int s = 0; s < pat->symptomCount; s++) {
-            Symptom *sym = &pat->symptoms[s];
- 
-            if (sym->neat)
-                continue;
- 
-            bool all_present = true;
- 
-            for (int t = 0; t < sym->toolCount; t++) {
-                bool isFound = false;
- 
-                for (int p = 0; p < tray[chair_idx].count; p++) {
-                    if (tray[chair_idx].tools[p] == sym->tools[t]) {
-                        isFound = true;
-                        break;
-                    }
-                }
- 
-                if (!isFound) {
-                    all_present = false;
-                    break;
-                }
-            }
- 
-            if (all_present) {
-                sym->neat = true;
-                sym->toolsUsed = sym->toolCount;
-            }
-        }
- 
-        pat->isTreated = isEntirelyCared(pat);
-        tray[chair_idx].isDirty = true;
-        tray[chair_idx].patientIdx = num_patient;
-        P1.hasGloves = GLOVES_USED; // gants deviennent sales après le soin
- 
-        if (pat->isTreated) {
-            treat_patient(chair_idx, chair_patient, neat_chair); 
-            float ratio = (float)pat->patienceLeft / (float)pat->patienceMax;
-            int payment;
-            if (ratio > 0.6f){
-                payment = 200;      // patient satisfait : plein tarif
-                satisfied_patient++;}
-            else if (ratio > 0.3f){
-                payment = 100;      // patient impatient : demi-tarif
-                unsatisfied_patient++;}
-            else{
-                payment = 50;       // patient très impatient : quart de tarif
-                unsatisfied_patient++;}
-            P1.money += payment;
-        }
-    }
-    break;
     }
     }
     }
