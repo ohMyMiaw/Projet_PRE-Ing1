@@ -106,24 +106,26 @@ ToolType objectToTool(enum Object obj) {
 }
 
 
+void update_patients_waiting_room(int *next_patient, int chair_patient[4],
+                                   int *next_timer, Tray tray[4], PatientList *patientList) {
+    int free_chairs = 0;
+    for (int i = 0; i < 4; i++) {
+        if (chair_patient[i] == 0 && !tray[i].isDirty)
+            free_chairs++;
+    }
+    if (free_chairs == 0) return;
 
-
-void update_patients_waiting_room(int *next_patient, int chair_patient[4], int *next_timer) {
-    // Si tous les patients sont arrivés, on arrête
-    if (*next_patient > 4) return;
-
-    (*next_timer)--;
+    (*next_timer) -= 1 + free_chairs;
 
     if (*next_timer <= 0) {
-        int chair_idx = *next_patient - 1; // P1→chaise 0, P2→chaise 1, etc.
-
-        // Le patient s'assoit sur SA chaise
-        chair_patient[chair_idx] = *next_patient;
-
-        (*next_patient)++;
-
-        // Attendre au moins 15 secondes avant le suivant (+ aléatoire)
-        *next_timer = 50 + rand() % 10;
+        for (int i = 0; i < 4; i++) {
+            if (chair_patient[i] == 0 && !tray[i].isDirty) {
+                spawnNewPatient(patientList, i); // i = index chaise = index patient
+                chair_patient[i] = i + 1;        // i+1 pour éviter 0 (= chaise vide)
+                *next_timer = 150 + rand() % 20;
+                break;
+            }
+        }
     }
 }
 
@@ -134,7 +136,7 @@ void treat_patient(int chair_idx, int chair_patient[4], bool neat_chair[4]) {
     }
 }
 
-void display(Player P1, PatientList patientList, int next_patient, int chair_patient[4], int next_timer, bool neat_chair[4], Tray tray[4], int furious_patient) {
+void display(Player P1, PatientList patientList, int next_patient, int chair_patient[4], int next_timer, bool neat_chair[4], Tray tray[4], int furious_patient, int unsatisfied_patient, int satisfied_patient) {
     int c = 0; // pour stocker les entrées du joueur
     /* ici c était un char car x arrête le programme, mais pour les touches directionnelles, 
     on a besoin d'un int pour contenir les codes spéciaux (ex: 1000 pour KEY_UP), d'où le changement de type de c en int
@@ -160,7 +162,6 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
 
     grid[8][2].obj = TRASH1; // Placer une poubelle à la position (8,2)
     grid[8][4].obj = TRASH2; // Placer une autre poubelle à la position (8,4)
-    grid[8][6].obj = TRASH3; // Placer une autre poubelle à la position (8,6)
 
     grid[1][8].obj = TRAY; // Placer le plateau du dentiste à la position (1,8)
     grid[2][8].obj = TRAY; // Placer le plateau du dentiste à la position (2,8)
@@ -213,34 +214,34 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
     case 'd': if (P1.x < M_WIDTH - 1)  P1.x++; break;
     case ' ':
         if (grid[P1.y][P1.x].obj == GLOVES && P1.hasGloves == BAREHANDS) { // ramasser les gants seulement si on n'en a pas déjà
-            P1.hasGloves = GLOVES_CLEAN; P1.money -= GLOVE_PRICE;
+            P1.hasGloves = GLOVES_CLEAN; P1.money -= GLOVE_PRICE; P1.moneySpent += GLOVE_PRICE;
         }
         else if (grid[P1.y][P1.x].obj == PROBE && P1.objectId == 0) { // ramasser la sonde seulement si on n'en a pas déjà
-            P1.objectId = PROBE; P1.money -= PROBE_PRICE;
+            P1.objectId = PROBE; P1.money -= PROBE_PRICE; P1.moneySpent += PROBE_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == CLAMP && P1.objectId == 0) { // ramasser la pince seulement si on n'en a pas déjà
-            P1.objectId = CLAMP; P1.money -= CLAMP_PRICE;
+            P1.objectId = CLAMP; P1.money -= CLAMP_PRICE; P1.moneySpent += CLAMP_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == SYRINGE && P1.objectId == 0) { // ramasser la seringue seulement si on n'en a pas déjà
-            P1.objectId = SYRINGE; P1.money -= SYRINGE_PRICE;
+            P1.objectId = SYRINGE; P1.money -= SYRINGE_PRICE; P1.moneySpent += SYRINGE_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == MIRROR && P1.objectId == 0) { // ramasser le miroir seulement si on n'en a pas déjà
-            P1.objectId = MIRROR; P1.money -= MIRROR_PRICE;
+            P1.objectId = MIRROR; P1.money -= MIRROR_PRICE; P1.moneySpent += MIRROR_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == SUCTION && P1.objectId == 0) { // ramasser l'extracteur de salive seulement si on n'en a pas déjà
-            P1.objectId = SUCTION; P1.money -= SUCTION_PRICE;
+            P1.objectId = SUCTION; P1.money -= SUCTION_PRICE; P1.moneySpent += SUCTION_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == DRILL && P1.objectId == 0) { // ramasser la roulette seulement si on n'en a pas déjà
-            P1.objectId = DRILL; P1.money -= DRILL_PRICE;
+            P1.objectId = DRILL; P1.money -= DRILL_PRICE; P1.moneySpent += DRILL_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
         }
         else if (grid[P1.y][P1.x].obj == COTTON && P1.objectId == 0) { // ramasser le coton seulement si on n'en a pas déjà
-            P1.objectId = COTTON; P1.money -= COTTON_PRICE;
+            P1.objectId = COTTON; P1.money -= COTTON_PRICE;P1.moneySpent += COTTON_PRICE;
             if (P1.hasGloves == BAREHANDS) P1.objectInfected = true;
         }
        else if (grid[P1.y][P1.x].obj == TRASH1 && P1.objectId != 0) { // recyclage : tool propre ou contaminé
@@ -354,8 +355,19 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
         P1.hasGloves = GLOVES_USED; // gants deviennent sales après le soin
  
         if (pat->isTreated) {
-            treat_patient(chair_idx, chair_patient, neat_chair);
-            P1.money += 100; // paiement du patient soigné
+            treat_patient(chair_idx, chair_patient, neat_chair); 
+            float ratio = (float)pat->patienceLeft / (float)pat->patienceMax;
+            int payment;
+            if (ratio > 0.6f){
+                payment = 200;      // patient satisfait : plein tarif
+                satisfied_patient++;}
+            else if (ratio > 0.3f){
+                payment = 100;      // patient impatient : demi-tarif
+                unsatisfied_patient++;}
+            else{
+                payment = 50;       // patient très impatient : quart de tarif
+                unsatisfied_patient++;}
+            P1.money += payment;
         }
     }
     break;
@@ -365,7 +377,7 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
 
     
     // 2. affichage
-    update_patients_waiting_room(&next_patient, chair_patient, &next_timer);
+    update_patients_waiting_room(&next_patient, chair_patient, &next_timer, tray, &patientList);
 
     // 2.1 affichage grille
     #ifdef _WIN32
@@ -403,7 +415,7 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
         printf("\n");
 
     }
-    printf("|   |   |   |T1 |   |T2 |   |T3 |   |   |   |\n");
+    printf("|   |   |   |T1 |   |T2 |   |   |   |   |   |\n");
     printf("----------------------------------------------\n");
 
     //2.2 affichage infos des tools (à droite de la grille)
@@ -541,9 +553,13 @@ printf("\e7");
 printf("\e[%d;%dH", display3.row++, display3.col);
 printf("+============ SCORE ============+");
 printf("\e[%d;%dH", display3.row++, display3.col);
-printf("| Money spent : " GREEN "%5d$" RESET "           |", 500 - (P1.money ));
+printf("| Money spent : " GREEN "%5d$" RESET "           |", P1.moneySpent);
 printf("\e[%d;%dH", display3.row++, display3.col);
 printf("| Patients furious : " RED "%5d" RESET "       |", furious_patient);
+printf("\e[%d;%dH", display3.row++, display3.col);
+printf("| Dissatisfied Patients : " GREEN "%5d" RESET "  |", unsatisfied_patient);
+printf("\e[%d;%dH", display3.row++, display3.col);
+printf("| Satisfied Patients : " GREEN "%5d" RESET "     |", satisfied_patient);
 printf("\e[%d;%dH", display3.row++, display3.col);
 printf("+===============================+");
 
@@ -587,7 +603,7 @@ printf("\e8");
         #endif
         printf(RED "\n\n=== GAME OVER ===\n" RESET);
         printf("3 patients left furious!\n");
-        printf("Final score: %d$\n\n", P1.money);
+        printf("Final score: %d$\n\n", P1.moneySpent);
     }
 
 
@@ -595,6 +611,8 @@ printf("\e8");
     gs.P1             = P1;
     gs.patientList    = patientList;
     gs.furious_patient  = furious_patient;
+    gs.unsatisfied_patient = unsatisfied_patient;
+    gs.satisfied_patient = satisfied_patient;
     gs.next_timer   = next_timer;
     gs.next_patient = next_patient;
     for (int i = 0; i < 4; i++) {

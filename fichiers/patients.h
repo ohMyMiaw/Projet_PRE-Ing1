@@ -74,6 +74,8 @@ typedef struct {
 
 // --- Fonctions ---
 void initPatients(PatientList *list);
+void spawnNewPatient(PatientList *list, int chair_idx);
+void initPatient(Patient *p);
 void updatePatience(PatientList *list);
 void displayPatience(Patient *p, int row, int col); // la barre de patiente est affichée à la row et colonne spécifiée
 bool applyTool(Patient *p, ToolType outil);

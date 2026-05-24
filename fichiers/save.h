@@ -15,6 +15,8 @@ typedef struct {
     bool neat_chair[4];       // CORRIGÉ : aligné avec display.c
     Tray tray[4];             // CORRIGÉ : tray sans "s" pour matcher display.c
     int furious_patient;
+    int unsatisfied_patient;
+    int satisfied_patient;
 } GameState;
 
 void saveDisplay();

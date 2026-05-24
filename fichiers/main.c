@@ -162,7 +162,7 @@ int main() {
     }
 
     if(position == START){
-        Player P1 = {4, 4, BAREHANDS, 0, NONE, false, 500}; // Position initiale du joueur
+        Player P1 = {4, 4, BAREHANDS, 0, NONE, false, 500, 0}; // Position initiale du joueur
         int patient_chair[4] = {0, 0, 0, 0};  // 0=vide, 1=P1, 2=P2, 3=P3, 4=P4
         int next_patient = 1;               // prochain patient à faire arriver (1 à 4)
         int next_timer   = 50;              // secondes avant l'arrivée du prochain patient
@@ -177,7 +177,7 @@ int main() {
         int furious_patient = 0; // 0 Nombre de patient qui repartent furieux (perte de la partie à 4), 1 patient qui repart furieux (perte de la partie à 3), etc.
         PatientList patientList;
         initPatients(&patientList);
-        display(P1, patientList, next_patient, patient_chair, next_timer, cured_chair, trays, furious_patient);
+        display(P1, patientList, next_patient, patient_chair, next_timer, cured_chair, trays, furious_patient, 0, 0);
     }
     else if(position == SAVE){
         saveDisplay();

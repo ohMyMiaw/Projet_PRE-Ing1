@@ -57,6 +57,8 @@ GameState loadGame(int saveSlot) {
         state.tray[i] = (Tray){.count=0, .isDirty=false, .patientIdx=-1}; // Corrigé (tray au lieu de trays)
     }
     state.furious_patient  = 0;
+    state.unsatisfied_patient = 0;
+    state.satisfied_patient = 0;
     state.next_timer   = 50;
     state.next_patient = 1;          // CORRIGÉ ! Tu avais mis state.next_timer = 1; ici !
 
@@ -145,7 +147,7 @@ void saveDisplay() {
         
         // CORRIGÉ : L'ordre exact et les bons arguments de la fonction display !
         display(s.P1, s.patientList, s.next_patient, s.chair_patient, s.next_timer, s.neat_chair,
-                s.tray, s.furious_patient);
+                s.tray, s.furious_patient, s.unsatisfied_patient, s.satisfied_patient);
                 
     } else if (position == RETURN) {
         main();

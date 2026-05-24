@@ -65,43 +65,41 @@ static void generateRandomSymptoms(Patient *p) {
     }
 }
 
+static const char *names_pool[] = {
+    " Arno", " Aya", " Fares", " Marie", " Lucas", " Emma",
+    " Noah", " Chloe", " Liam", " Lea", " Hugo", " Camille",
+    " Louis", " Manon", " Gabriel", " Inès", " Raphael", " Jade",
+    " Arthur", " Lucie"
+};
+#define NB_NAMES 20
+
+// Crée un seul patient à l'index donné
+void initPatient(Patient *p) {
+    memset(p, 0, sizeof(Patient));
+    strcpy(p->name, names_pool[rand() % NB_NAMES]);
+    int pat = 8000 + rand() % 3000;
+    p->patienceMax  = pat;
+    p->patienceLeft = pat;
+    p->isTreated    = false;
+    generateRandomSymptoms(p);
+}
+// Appelé une seule fois au lancement : crée le premier patient sur la chaise 0
+
 void initPatients(PatientList *list) {
     srand((unsigned int)time(NULL));
-    list->count = 4; // 1 patient par chaise dans la salle d'attente pour 4 chaises
-
-    const char *names_pool[] = {
-        " Arno", " Aya", " Fares", " Marie", " Lucas", " Emma",
-        " Noah", " Chloe", " Liam", " Lea", " Hugo", " Camille",
-        " Louis", " Manon", " Gabriel", " Inès", " Raphael", " Jade",
-        " Arthur", " Lucie"
-    };
-    int nb_names = 20;
-    int patience[4]; // l'impatience maximale de chaque patient (entre 800 et 4000, soit entre 13 et 67 secondes à la baisse d'une unité par seconde)
-    for (int i = 0; i < 4; i++) {
-        patience[i] = 8000 + rand() % 3000; // a changer ici pour les test ( plus rapide)
-    }
-    for (int i = 0; i < 4; i++) {
-        // Prénom aléatoire sans doublon
-        int idx;
-        bool already_taken;
-        do {
-            already_taken = false;
-            idx = rand() % nb_names;
-            for (int j = 0; j < i; j++) {
-                if (strcmp(list->patients[j].name, names_pool[idx]) == 0) {
-                    already_taken = true;
-                    break;
-                }
-            }
-        } while (already_taken);
-
-        strcpy(list->patients[i].name, names_pool[idx]);
-        list->patients[i].patienceMax  = patience[i];
-        list->patients[i].patienceLeft = patience[i];
-        list->patients[i].isTreated    = false;
-        generateRandomSymptoms(&list->patients[i]);
-    }
+    memset(list, 0, sizeof(PatientList));
+    // un seul patient au départ, sur la chaise 0
+    initPatient(&list->patients[0]);
+    list->count = 1;
 }
+
+// Appelé quand une chaise se libère
+void spawnNewPatient(PatientList *list, int chair_idx) {
+    // réutilise le slot de la chaise directement (0-3)
+    initPatient(&list->patients[chair_idx]);
+}
+
+
 // changement de la patience de chacun des patients de la salle d'attente ( le patient perd de la patience chaque seconde, et si il arrive à 0, c'est perdu )
 void updatePatience(PatientList *list) {
     for (int i = 0; i < list->count; i++) {
