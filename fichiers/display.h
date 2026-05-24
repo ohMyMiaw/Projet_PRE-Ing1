@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include "items.h"
 
-
 enum GLOVES_STATUS {
     BAREHANDS,
     GLOVES_CLEAN,
@@ -30,7 +29,6 @@ typedef struct {
 
 
 void display(Player P1);
-
 
 
 #endif

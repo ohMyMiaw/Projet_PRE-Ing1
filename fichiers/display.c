@@ -25,11 +25,22 @@
     #include <sys/select.h>
 
     int kbhit() {
+        struct termios oldt, newt;
+        
+        tcgetattr(STDIN_FILENO, &oldt);
+        newt = oldt;
+        newt.c_lflag &= ~(ICANON | ECHO);
+        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
         struct timeval tv = {0L, 0L};
         fd_set fds;
         FD_ZERO(&fds);
         FD_SET(STDIN_FILENO, &fds);
-        return select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+        int result = select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
+        return result;
     }
 #endif
 

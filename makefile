@@ -1,18 +1,12 @@
 CC = gcc
-SRC = $(wildcard fichiers/*.c)
-OBJ = $(patsubst fichiers/%.c, build/%.o, $(SRC))
-EXEC = build/jeu
+CFLAGS = -Wall -g
+SRC = fichiers/display.c fichiers/items.c fichiers/patients.c fichiers/map.c fichiers/data.c fichiers/dentist.c fichiers/save.c fichiers/main.c
+TARGET = game
 
-all: build $(EXEC)
+all: $(TARGET)
 
-build:
-	if not exist build mkdir build
-
-$(EXEC): $(OBJ)
-	$(CC) $(OBJ) -o $(EXEC)
-
-build/%.o: fichiers/%.c
-	$(CC) -c $< -o $@
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
 
 clean:
-	del /f $(OBJ) $(EXEC).exe
+	rm -f $(TARGET)
