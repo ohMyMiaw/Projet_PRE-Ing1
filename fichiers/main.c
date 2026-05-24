@@ -5,10 +5,10 @@
 #include "patients.h"
 
 // les couleurs ANSI, pour rendre le terminal plus joli
-#define ROUGE   "\033[31m" 
-#define VERT    "\033[32m"
-#define JAUNE   "\033[33m"
-#define BLEU    "\033[34m"
+#define RED   "\033[31m" 
+#define GREEN    "\033[32m"
+#define YELLOW   "\033[33m"
+#define BLUE    "\033[34m"
 #define RESET   "\033[0m"
 
 #ifdef _WIN32
@@ -46,13 +46,13 @@ void Help(){
         system("clear");
     #endif
 
-    printf(VERT "\n  +============== HELP - CAVITY-TASKFORCE ==============+\n\n" RESET);
+    printf(GREEN "\n  +============== HELP - CAVITY-TASKFORCE ==============+\n\n" RESET);
 
-    printf("  " JAUNE "OBJECTIVE:" RESET "\n");
+    printf("  " YELLOW "OBJECTIVE:" RESET "\n");
     printf("    Manage a dental office. Treat patients\n");
     printf("    as fast as possible to maximize your earnings!\n\n");
 
-    printf("  " JAUNE "HOW TO PLAY:" RESET "\n");
+    printf("  " YELLOW "HOW TO PLAY:" RESET "\n");
     printf("    1. A patient arrives and sits in a chair\n");
     printf("    2. Go get sterile gloves (Gl)\n");
     printf("    3. Pick up the required tools one by one\n");
@@ -61,7 +61,7 @@ void Help(){
     printf("    6. Pick up the dirty tray and empty it in Ob (biohazard)\n");
     printf("    7. Your gloves are discarded at the same time\n\n");
 
-    printf("  " JAUNE "IMPORTANT RULES:" RESET "\n");
+    printf("  " YELLOW "IMPORTANT RULES:" RESET "\n");
     printf("    - Without gloves, the tool is CONTAMINATED -> recycling (Rc)\n");
     printf("    - With dirty gloves, the patient panics and leaves furious\n");
     printf("    - If all chairs are full and a patient leaves furious -> GAME OVER\n");
@@ -71,7 +71,7 @@ void Help(){
     printf("    - Furious patient: no payment\n");
     printf("    - If a patient arrives with a dirty tray: will NOT pay\n\n");
 
-    printf("  " JAUNE "CONTROLS:" RESET "\n");
+    printf("  " YELLOW "CONTROLS:" RESET "\n");
     printf("    Z, Q, S, D    -> Move\n");
     printf("    SPACE or E    -> Contextual action\n");
     printf("    X             -> Quit\n\n");
@@ -93,7 +93,7 @@ int main() {
 
     int position = START;
 
-    char choix;
+    char choice;
 
     while (1) {
 
@@ -144,15 +144,15 @@ int main() {
             printf("5. Quit <-\n");
         }
 
-        choix = getch();
+        choice = getch();
 
-        if(choix == 's' && position < QUIT){
+        if(choice == 's' && position < QUIT){
             position++;
         }
-        else if(choix == 'z' && position > START){
+        else if(choice == 'z' && position > START){
             position--;
         }
-        else if(choix == ' '){
+        else if(choice == ' '){
             if(position == HELP){
                 Help();
             } else {
@@ -163,21 +163,21 @@ int main() {
 
     if(position == START){
         Player P1 = {4, 4, BAREHANDS, 0, NONE, false, 500}; // Position initiale du joueur
-        int chaise_patient[4] = {0, 0, 0, 0};  // 0=vide, 1=P1, 2=P2, 3=P3, 4=P4
-        int prochain_patient = 1;               // prochain patient à faire arriver (1 à 4)
-        int timer_prochain   = 50;              // secondes avant l'arrivée du prochain patient
-        bool chaise_soignee[4] = {false, false, false, false}; // true = dentiste a soigné
-        Plateau plateaux[4] = {
-            {.count = 0, .estSale = false, .patientIdx = -1},
-            {.count = 0, .estSale = false, .patientIdx = -1},
-            {.count = 0, .estSale = false, .patientIdx = -1},
-            {.count = 0, .estSale = false, .patientIdx = -1},
+        int patient_chair[4] = {0, 0, 0, 0};  // 0=vide, 1=P1, 2=P2, 3=P3, 4=P4
+        int next_patient = 1;               // prochain patient à faire arriver (1 à 4)
+        int next_timer   = 50;              // secondes avant l'arrivée du prochain patient
+        bool cured_chair[4] = {false, false, false, false}; // true = dentiste a soigné
+        Tray trays[4] = {
+            {.count = 0, .isDirty = false, .patientIdx = -1},
+            {.count = 0, .isDirty = false, .patientIdx = -1},
+            {.count = 0, .isDirty = false, .patientIdx = -1},
+            {.count = 0, .isDirty = false, .patientIdx = -1},
         };
-        // plateau du dentiste, où il pose les outils pour soigner le patient
-        int patient_furieux = 0; // 0 Nombre de patient qui repartent furieux (perte de la partie à 4), 1 patient qui repart furieux (perte de la partie à 3), etc.
+        // plateau du dentiste, où il pose les tools pour soigner le patient
+        int furious_patient = 0; // 0 Nombre de patient qui repartent furieux (perte de la partie à 4), 1 patient qui repart furieux (perte de la partie à 3), etc.
         PatientList patientList;
         initPatients(&patientList);
-        display(P1, patientList, prochain_patient, chaise_patient, timer_prochain, chaise_soignee, plateaux, patient_furieux);
+        display(P1, patientList, next_patient, patient_chair, next_timer, cured_chair, trays, furious_patient);
     }
     else if(position == SAVE){
         saveDisplay();

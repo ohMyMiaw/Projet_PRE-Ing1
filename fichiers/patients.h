@@ -8,9 +8,9 @@
 
 // --- Constantes arbitraires ---
 #define MAX_SYMPTOMS 3      // nombre max de symptomes par patient
-#define MAX_TOOLS    5      // nombre max d'outils par symptome
+#define MAX_TOOLS    5      // nombre max d'tools par symptome
 #define MAX_PATIENTS 4      // nombre max de patients dans la salle d'attente
-#define MAX_TOOLS_ON_TRAY 8 // nombre max d'outils sur le plateau du dentiste
+#define MAX_TOOLS_ON_TRAY 8 // nombre max d'tools sur le plateau du dentiste
 // --- Outils disponibles ---
 typedef enum {
     TOOL_GLOVES,
@@ -26,22 +26,22 @@ typedef enum {
 
  
 
-// Plateau du dentiste, où il pose les outils pour soigner le patient
+// Tray du dentiste, où il pose les tools pour soigner le patient
 typedef struct {
-    ToolType outils[MAX_TOOLS_ON_TRAY];
+    ToolType tools[MAX_TOOLS_ON_TRAY];
     int      count;
-    bool     estSale;   // true après utilisation sur un patient
+    bool     isDirty;   // true après utilisation sur un patient
     int      patientIdx; // -1 si pas assigné
-} Plateau;
+} Tray;
 
 
-// --- Symptome --- les symptomes qui vont donner la liste des outils à utiliser pour le patien
+// --- Symptome --- les symptomes qui vont donner la liste des tools à utiliser pour le patien
 typedef struct {
     char      name[50];
     char      description[234];
     ToolType  tools[MAX_TOOLS];
     int       toolCount;
-    bool      soigne;
+    bool      neat;
     int       toolsUsed;
 } Symptom;
 
@@ -59,7 +59,7 @@ typedef struct {
     int     symptomCount;
     int     patienceMax;
     int     patienceLeft;
-    bool    estSoigne;
+    bool    isTreated;
 } Patient;
 
 
@@ -75,9 +75,9 @@ typedef struct {
 // --- Fonctions ---
 void initPatients(PatientList *list);
 void updatePatience(PatientList *list);
-void displayPatience(Patient *p, int ligne, int col); // la barre de patiente est affichée à la ligne et colonne spécifiée
-bool appliquerOutil(Patient *p, ToolType outil);
-bool estEntierementSoigne(Patient *p);
+void displayPatience(Patient *p, int row, int col); // la barre de patiente est affichée à la row et colonne spécifiée
+bool applyTool(Patient *p, ToolType outil);
+bool isEntirelyCared(Patient *p);
 const char* toolName(ToolType t);
 
 #endif // PATIENTS_H

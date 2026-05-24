@@ -1,5 +1,6 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
+
 #include <stdbool.h>
 #include "items.h"
 #include "patients.h"
@@ -10,27 +11,23 @@ enum GLOVES_STATUS {
     GLOVES_USED,
 };
 
-enum TRAIL{
+enum TRAIL {
     NONE,
     TRAIL_CLEAN,
     TRAIL_DIRTY,
 };
 
-
-
 typedef struct {
     int x;
     int y;
     enum GLOVES_STATUS hasGloves;
-    enum Object objetId;
+    enum Object objectId;
     enum TRAIL trail;
-    bool objetInfected;
+    bool objectInfected;
     int money;
     int moneyEarned;
 } Player;
 
 
-void display(Player P1, PatientList patientList, int prochain_patient, int chaise_patient[4], int timer_prochain, bool chaise_soignee[4], Plateau plateaux[4], int patient_furieux);
-
-
+void display(Player P1, PatientList patientList, int next_patient, int chair_patient[4], int next_timer, bool neat_chair[4], Tray tray[4], int furious_patient);
 #endif

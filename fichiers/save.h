@@ -9,12 +9,12 @@ char getch();
 typedef struct {
     Player P1;
     PatientList patientList;
-    int chaise_patient[4];
-    Plateau plateaux[4];
-    int patient_furieux;
-    bool chaise_soignee[4];
-    int timer_prochain;
-    int prochain_patient;
+    int next_patient;         // CORRIGÉ : remplace le next_timer en double
+    int chair_patient[4];     // CORRIGÉ : aligné avec display.c
+    int next_timer;
+    bool neat_chair[4];       // CORRIGÉ : aligné avec display.c
+    Tray tray[4];             // CORRIGÉ : tray sans "s" pour matcher display.c
+    int furious_patient;
 } GameState;
 
 void saveDisplay();

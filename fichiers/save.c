@@ -52,13 +52,13 @@ GameState loadGame(int saveSlot) {
     state.P1 = (Player){4, 4, BAREHANDS, 0, NONE, false, 500, 0};
     state.patientList = pl;
     for (int i = 0; i < 4; i++) {
-        state.chaise_patient[i] = 0;
-        state.chaise_soignee[i] = 0;
-        state.plateaux[i] = (Plateau){.count=0, .estSale=false, .patientIdx=-1};
+        state.chair_patient[i] = 0;  // Corrigé pour correspondre à display.c
+        state.neat_chair[i] = 0;     // Corrigé pour correspondre à display.c
+        state.tray[i] = (Tray){.count=0, .isDirty=false, .patientIdx=-1}; // Corrigé (tray au lieu de trays)
     }
-    state.patient_furieux  = 0;
-    state.timer_prochain   = 50;
-    state.prochain_patient = 1;
+    state.furious_patient  = 0;
+    state.next_timer   = 50;
+    state.next_patient = 1;          // CORRIGÉ ! Tu avais mis state.next_timer = 1; ici !
 
     char filename[20];
     sprintf(filename, "save%d.bin", saveSlot);
@@ -87,7 +87,7 @@ void saveDisplay() {
 
     int position = SAVE1;
 
-    char choix;
+    char choice;
 
     while (1) {
 
@@ -126,15 +126,15 @@ void saveDisplay() {
             printf("4. Return <-\n");
         }
 
-        choix = getch();
+        choice = getch();
 
-        if(choix == 's' && position < RETURN){
+        if(choice == 's' && position < RETURN){
             position++;
         }
-        else if(choix == 'z' && position > SAVE1){
+        else if(choice == 'z' && position > SAVE1){
             position--;
         }
-        else if(choix == ' '){
+        else if(choice == ' '){
             break;
         }
     }
@@ -142,8 +142,11 @@ void saveDisplay() {
     if (position == SAVE1 || position == SAVE2 || position == SAVE3) {
         int slot = position + 1; // SAVE1=0 → slot 1, etc.
         GameState s = loadGame(slot);
-        display(s.P1,s.patientList, s.prochain_patient, s.chaise_patient, s.timer_prochain, s.chaise_soignee,
-                s.plateaux, s.patient_furieux);
+        
+        // CORRIGÉ : L'ordre exact et les bons arguments de la fonction display !
+        display(s.P1, s.patientList, s.next_patient, s.chair_patient, s.next_timer, s.neat_chair,
+                s.tray, s.furious_patient);
+                
     } else if (position == RETURN) {
         main();
     }
@@ -158,6 +161,4 @@ void saveGame(GameState gameState) {
     else{
         printf("Game save cancelled.\n");
     }
-
-
 }
