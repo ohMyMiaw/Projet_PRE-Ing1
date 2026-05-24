@@ -355,6 +355,7 @@ void display(Player P1, PatientList patientList, int prochain_patient, int chais
  
         if (pat->estSoigne) {
             soigner_patient(chaise_idx, chaise_patient, chaise_soignee);
+            P1.money += 100; // paiement du patient soigné
         }
     }
     break;
@@ -372,9 +373,9 @@ void display(Player P1, PatientList patientList, int prochain_patient, int chais
     SetConsoleCP(CP_UTF8);
     #endif
     printf("----------------------------------------------\n");
-    printf("|   |   | " GREEN "G" "\033[0m" " | " GREEN "P" "\033[0m" " | " GREEN "C" "\033[0m" " | " GREEN "M" "\033[0m" " |   |   |   |   |   |\n");
+    printf("|   |   |" GREEN "Gl" "\033[0m" " |" GREEN "Pr" "\033[0m" " |" GREEN "Co" "\033[0m" " |" GREEN "Mi" "\033[0m" " |   |   |   |   |   |\n");
     for (int i = 0; i < M_HEIGHT; i++) {
-        printf("| %s |", (i == 1) ? GREEN "S" RESET : (i == 2) ? GREEN "S" RESET : (i == 3) ? GREEN "C" RESET : (i == 4) ? GREEN "D" RESET : " ");
+        printf("|%s |", (i == 1) ? GREEN "Su" RESET : (i == 2) ? GREEN "Sy" RESET : (i == 3) ? GREEN "Cl" RESET : (i == 4) ? GREEN "Dr" RESET : "  ");
         for (int j = 0; j < M_WIDTH; j++) {
             if (P1.x == j && P1.y == i) {
                 printf("😷 |");
@@ -425,7 +426,7 @@ printf("\e[%d;%dH", display1.ligne++, display1.col);
 printf("Money        : %d", P1.money);
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("--- Plateau ---");
+printf("--- TRAIL ---");
 
 for (int i = 0; i < 4; i++) {
     printf("\e[%d;%dH", display1.ligne++, display1.col);
@@ -518,7 +519,7 @@ DisplayBase display2 = {1, 110};
 printf("\e7");
 
 printf("\e[%d;%dH", display2.ligne++, display2.col);
-printf("+============ PRIX DES OUTILS ============+");
+printf("+============ TOOLS PRICES ============+");
 
 // Tableau des outils et leurs prix
 const char* noms_outils[]  = {"Gloves ", "Probe ", "Mirror ", "Suction ", "Syringe ", "Clamp ", "Drill ", "Cotton "};
@@ -540,9 +541,9 @@ printf("\e7");
 printf("\e[%d;%dH", display3.ligne++, display3.col);
 printf("+============ SCORE ============+");
 printf("\e[%d;%dH", display3.ligne++, display3.col);
-printf("| Argent Gagné : " GREEN "%5d$" RESET "           |", 500 - (P1.money ));
+printf("| Money spent : " GREEN "%5d$" RESET "           |", 500 - (P1.money ));
 printf("\e[%d;%dH", display3.ligne++, display3.col);
-printf("| Patients furieux : " RED "%5d" RESET "       |", patient_furieux);
+printf("| Patients furious : " RED "%5d" RESET "       |", patient_furieux);
 printf("\e[%d;%dH", display3.ligne++, display3.col);
 printf("+===============================+");
 
