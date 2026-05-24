@@ -34,34 +34,46 @@
 
 #endif
 
-void saving(Player P1, int saveSlot) {
+void saving(GameState gameState, int saveSlot) {
     char filename[20];
     sprintf(filename, "save%d.bin", saveSlot);
     FILE* f = fopen(filename, "wb");
     if (f == NULL) { printf("Error saving game\n"); return; }
-    fwrite(&P1, sizeof(Player), 1, f);
+    fwrite(&gameState, sizeof(GameState), 1, f);
     fclose(f);
     printf("Game saved successfully.\n");
 }
 
+GameState loadGame(int saveSlot) {
+    GameState state;
+    // valeurs par défaut
+    PatientList pl;
+    initPatients(&pl);
+    state.P1 = (Player){4, 4, BAREHANDS, 0, NONE, false, 500, 0};
+    state.patientList = pl;
+    for (int i = 0; i < 4; i++) {
+        state.chaise_patient[i] = 0;
+        state.chaise_soignee[i] = 0;
+        state.plateaux[i] = (Plateau){.count=0, .estSale=false, .patientIdx=-1};
+    }
+    state.patient_furieux  = 0;
+    state.timer_prochain   = 50;
+    state.prochain_patient = 1;
 
-Player loadGame(int saveSlot) {
-    Player P1;
     char filename[20];
     sprintf(filename, "save%d.bin", saveSlot);
     FILE* f = fopen(filename, "rb");
-    if (f == NULL) { 
+    if (f == NULL) {
         printf("No save found, starting new game.\n");
         #ifdef _WIN32
-            Sleep(8000);
+            Sleep(1000);
         #endif
-        Player P1 = {4, 4, BAREHANDS, 0, NONE, false, 500};
-        return P1; 
+        return state;
     }
-    fread(&P1, sizeof(Player), 1, f);
+    fread(&state, sizeof(GameState), 1, f);
     fclose(f);
     printf("Game loaded successfully.\n");
-    return P1;
+    return state;
 }
 
 
@@ -127,26 +139,22 @@ void saveDisplay() {
         }
     }
 
-    if(position == SAVE1){
-        display(loadGame(1));
-    }
-    else if(position == SAVE2){
-        display(loadGame(2));
-    }
-    else if(position == SAVE3){
-        display(loadGame(3));
-    }
-    else if(position == RETURN){
+    if (position == SAVE1 || position == SAVE2 || position == SAVE3) {
+        int slot = position + 1; // SAVE1=0 → slot 1, etc.
+        GameState s = loadGame(slot);
+        display(s.P1,s.patientList, s.prochain_patient, s.chaise_patient, s.timer_prochain, s.chaise_soignee,
+                s.plateaux, s.patient_furieux);
+    } else if (position == RETURN) {
         main();
     }
 }
 
-void saveGame(Player P1) {
+void saveGame(GameState gameState) {
     // 1. gestion des entrées clavier
     int c;
     printf("Do you want to save the game? (1/2/3/x)\n");
     c = getch();
-    if(c == '1'||c == '2'||c == '3') saving(P1,c - '0');
+    if(c == '1'||c == '2'||c == '3') saving(gameState,c - '0');
     else{
         printf("Game save cancelled.\n");
     }

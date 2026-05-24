@@ -2,6 +2,7 @@
 #define DISPLAY_H
 #include <stdbool.h>
 #include "items.h"
+#include "patients.h"
 
 enum GLOVES_STATUS {
     BAREHANDS,
@@ -25,10 +26,11 @@ typedef struct {
     enum TRAIL trail;
     bool objetInfected;
     int money;
+    int moneyEarned;
 } Player;
 
 
-void display(Player P1);
+void display(Player P1, PatientList patientList, int prochain_patient, int chaise_patient[4], int timer_prochain, bool chaise_soignee[4], Plateau plateaux[4], int patient_furieux);
 
 
 #endif
