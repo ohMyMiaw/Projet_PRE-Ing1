@@ -110,7 +110,13 @@ static int chaise_patient[4] = {0, 0, 0, 0};  // 0=vide, 1=P1, 2=P2, 3=P3, 4=P4
 static int prochain_patient = 1;               // prochain patient à faire arriver (1 à 4)
 static int timer_prochain   = 50;              // secondes avant l'arrivée du prochain patient
 static bool chaise_soignee[4] = {false, false, false, false}; // true = dentiste a soigné
-static Plateau plateau = {.count = 0, .estSale = false, .patientIdx = -1}; // plateau du dentiste, où il pose les outils pour soigner le patient
+static Plateau plateaux[4] = {
+    {.count = 0, .estSale = false, .patientIdx = -1},
+    {.count = 0, .estSale = false, .patientIdx = -1},
+    {.count = 0, .estSale = false, .patientIdx = -1},
+    {.count = 0, .estSale = false, .patientIdx = -1},
+};
+ // plateau du dentiste, où il pose les outils pour soigner le patient
 static int patient_furieux = 0; // 0 Nombre de patient qui repartent furieux (perte de la partie à 4), 1 patient qui repart furieux (perte de la partie à 3), etc.
 
 void update_patients_salle_attente() {
@@ -251,45 +257,50 @@ void display(Player P1) {
             P1.objetId = 0; P1.objetInfected = false;
         }
         else if (grid[P1.y][P1.x].obj == TRASH2) {
-            if (plateau.estSale) {
-                plateau.count      = 0;
-                plateau.estSale    = false;
-                plateau.patientIdx = -1;
-                P1.objetId         = 0;
-                P1.objetInfected   = false;
-                P1.hasGloves       = BAREHANDS; // gants jetés en même temps que le plateau
+    // vider le plateau sale le plus proche (celui du patient soigné)
+            for (int i = 0; i < 4; i++) {
+                if (plateaux[i].estSale) {
+                    plateaux[i].count      = 0;
+                    plateaux[i].estSale    = false;
+                    plateaux[i].patientIdx = -1;
+                    P1.objetId             = 0;
+                    P1.objetInfected       = false;
+                    P1.hasGloves           = BAREHANDS;
+                    break; // un seul à la fois
+                }
             }
         }
-        else if (grid[P1.y][P1.x].obj == PLATEAU && P1.objetId != 0 && !plateau.estSale) {
-            // Refuser si outil contaminé
-            if (P1.objetInfected) {
-                // outil contaminé interdit sur plateau stérile, ne rien faire
-            }
-            else if (plateau.count < MAX_TOOLS_ON_TRAY) {
-                ToolType t = objetToTool(P1.objetId);
-                // Trouver le patient de la chaise adjacente (chaise i est à la ligne i+1)
-                int chaise_idx = P1.y - 1;
-                if (t != TOOL_NONE && chaise_idx >= 0 && chaise_idx <= 3 && chaise_patient[chaise_idx] != 0) {
-                    int num_patient = chaise_patient[chaise_idx] - 1;
-                    Patient *pat = &patientList.patients[num_patient];
-                    // Vérifier que l'outil est nécessaire pour ce patient
-                    bool outil_necessaire = false;
-                    for (int s = 0; s < pat->symptomCount; s++) {
-                        for (int ti = 0; ti < pat->symptoms[s].toolCount; ti++) {
-                            if (pat->symptoms[s].tools[ti] == t) {
-                                outil_necessaire = true;
-                                break;
+
+        else if (grid[P1.y][P1.x].obj == PLATEAU && P1.objetId != 0) {
+            int chaise_idx = P1.y - 1;
+            if (chaise_idx >= 0 && chaise_idx <= 3 && !plateaux[chaise_idx].estSale) {
+                if (P1.objetInfected) {
+                    // outil contaminé interdit sur plateau stérile, ne rien faire
+                }
+                else if (plateaux[chaise_idx].count < MAX_TOOLS_ON_TRAY) {
+                    ToolType t = objetToTool(P1.objetId);
+                    if (t != TOOL_NONE && chaise_patient[chaise_idx] != 0) {
+                        int num_patient = chaise_patient[chaise_idx] - 1;
+                        Patient *pat = &patientList.patients[num_patient];
+                        // Vérifier que l'outil est nécessaire pour ce patient
+                        bool outil_necessaire = false;
+                        for (int s = 0; s < pat->symptomCount; s++) {
+                            for (int ti = 0; ti < pat->symptoms[s].toolCount; ti++) {
+                                if (pat->symptoms[s].tools[ti] == t) {
+                                    outil_necessaire = true;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    // Vérifier que l'outil n'est pas déjà sur le plateau
-                    bool deja_present = false;
-                    for (int p = 0; p < plateau.count; p++) {
-                        if (plateau.outils[p] == t) { deja_present = true; break; }
-                    }
-                    if (outil_necessaire && !deja_present) {
-                        plateau.outils[plateau.count++] = t;
-                        P1.objetId = 0;
+                        // Vérifier que l'outil n'est pas déjà sur le plateau
+                        bool deja_present = false;
+                        for (int p = 0; p < plateaux[chaise_idx].count; p++) {
+                            if (plateaux[chaise_idx].outils[p] == t) { deja_present = true; break; }
+                        }
+                        if (outil_necessaire && !deja_present) {
+                            plateaux[chaise_idx].outils[plateaux[chaise_idx].count++] = t;
+                            P1.objetId = 0;
+                        }
                     }
                 }
             }
@@ -302,7 +313,7 @@ void display(Player P1) {
     
     if (P1.hasGloves != GLOVES_CLEAN) {
         if (chaise_idx >= 0 && chaise_idx <= 3 && chaise_patient[chaise_idx] != 0) {
-            plateau.estSale = true;
+            plateaux[chaise_idx].estSale = true;
             soigner_patient(chaise_idx); // patient part furieux, sans paiement
             patient_furieux++;
         }
@@ -311,47 +322,47 @@ void display(Player P1) {
 
     if (chaise_idx >= 0 && chaise_idx <= 3 &&
         chaise_patient[chaise_idx] != 0 &&
-        plateau.count > 0 &&
-        !plateau.estSale) {
-
+        plateaux[chaise_idx].count > 0 &&
+        !plateaux[chaise_idx].estSale) {
+ 
         int num_patient = chaise_patient[chaise_idx] - 1;
         Patient *pat = &patientList.patients[num_patient];
-
+ 
         for (int s = 0; s < pat->symptomCount; s++) {
             Symptom *sym = &pat->symptoms[s];
-
+ 
             if (sym->soigne)
                 continue;
-
+ 
             bool tous_presents = true;
-
+ 
             for (int t = 0; t < sym->toolCount; t++) {
                 bool trouve = false;
-
-                for (int p = 0; p < plateau.count; p++) {
-                    if (plateau.outils[p] == sym->tools[t]) {
+ 
+                for (int p = 0; p < plateaux[chaise_idx].count; p++) {
+                    if (plateaux[chaise_idx].outils[p] == sym->tools[t]) {
                         trouve = true;
                         break;
                     }
                 }
-
+ 
                 if (!trouve) {
                     tous_presents = false;
                     break;
                 }
             }
-
+ 
             if (tous_presents) {
                 sym->soigne = true;
                 sym->toolsUsed = sym->toolCount;
             }
         }
-
+ 
         pat->estSoigne = estEntierementSoigne(pat);
-        plateau.estSale = true;
-        plateau.patientIdx = num_patient;
+        plateaux[chaise_idx].estSale = true;
+        plateaux[chaise_idx].patientIdx = num_patient;
         P1.hasGloves = GLOVES_USED; // gants deviennent sales après le soin
-
+ 
         if (pat->estSoigne) {
             soigner_patient(chaise_idx);
         }
@@ -426,15 +437,19 @@ printf("\e[%d;%dH", display1.ligne++, display1.col);
 printf("Money        : %d", P1.money);
 
 printf("\e[%d;%dH", display1.ligne++, display1.col);
-printf("--- Plateau (%s) ---", plateau.estSale ? RED "SALE" RESET : GREEN "PROPRE" RESET);
+printf("--- Plateau ---");
 
-for (int t = 0; t < plateau.count; t++) {
+for (int i = 0; i < 4; i++) {
     printf("\e[%d;%dH", display1.ligne++, display1.col);
-    printf("  [%d] %s", t + 1, toolName(plateau.outils[t]));
-}
-if (plateau.count == 0) {
-    printf("\e[%d;%dH", display1.ligne++, display1.col);
-    printf("  (vide)");
+    printf("Plateau %d (%s):", i + 1,
+        plateaux[i].estSale ? RED "SALE" RESET : GREEN "PROPRE" RESET);
+    if (plateaux[i].count == 0) {
+        printf(" (vide)");
+    } else {
+        for (int t = 0; t < plateaux[i].count; t++) {
+            printf(" %s", toolName(plateaux[i].outils[t]));
+        }
+    }
 }
 
 printf("\e8");
@@ -448,22 +463,19 @@ printf("\e[%d;%dH", display_patients.ligne++, display_patients.col);
 printf("===== Patients & Symptomes =====");
 
 for (int i = 0; i < 4; i++) {
-    if (chaise_patient[i] == 0) continue; // chaise vide, on skip
+    if (chaise_patient[i] == 0) continue;
 
     int num_patient = chaise_patient[i] - 1;
     Patient *pat = &patientList.patients[num_patient];
 
-    // Nom du patient + chaise
     printf("\e[%d;%dH", display_patients.ligne++, display_patients.col);
     printf(YELLOW "[ Fauteuil %d ] %s" RESET, i + 1, pat->name);
 
-    // Pour chaque symptome du patient
     for (int s = 0; s < pat->symptomCount; s++) {
         Symptom *sym = &pat->symptoms[s];
 
         printf("\e[%d;%dH", display_patients.ligne++, display_patients.col);
 
-        // Nom du symptome : vert si soigné, rouge sinon
         if (sym->soigne)
             printf("  " GREEN "[OK] %s" RESET, sym->name);
         else
@@ -471,31 +483,29 @@ for (int i = 0; i < 4; i++) {
 
         printf(" -> ");
 
-        // Outils du symptome : vert si déjà sur le plateau, blanc sinon
         for (int t = 0; t < sym->toolCount; t++) {
             ToolType outil = sym->tools[t];
 
-            // Vérifier si l'outil est déjà sur le plateau
             bool sur_plateau = false;
-            for (int p = 0; p < plateau.count; p++) {
-                if (plateau.outils[p] == outil) {
+            for (int p = 0; p < plateaux[i].count; p++) {
+                if (plateaux[i].outils[p] == outil) {
                     sur_plateau = true;
                     break;
                 }
             }
 
             if (sur_plateau)
-                printf(GREEN "%s " RESET, toolName(outil)); // vert = déposé
+                printf(GREEN "%s " RESET, toolName(outil));
             else
-                printf("%s ", toolName(outil)); // blanc = manquant
+                printf("%s ", toolName(outil));
         }
     }
 
-    // Ligne vide entre les patients
     display_patients.ligne++;
 }
 
 printf("\e8");
+
 
 // -----------------------------------------------------------------------------------------------------------------
 DisplayBase display2 = {1, 110};
