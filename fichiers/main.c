@@ -86,7 +86,6 @@ int main() {
     enum Menu {
         START,
         SAVE,
-        LEADERBOARD,
         HELP,
         QUIT,
     };
@@ -107,41 +106,29 @@ int main() {
             printf("=== Menu ===\n");
             printf("1. Start <-\n");
             printf("2. Save\n");
-            printf("3. Leaderboard\n");
-            printf("4. Help\n");
-            printf("5. Quit\n");
+            printf("3. Help\n");
+            printf("4. Quit\n");
         }
         else if(position == SAVE){
             printf("=== Menu ===\n");
             printf("1. Start\n");
             printf("2. Save <-\n");
-            printf("3. Leaderboard\n");
-            printf("4. Help\n");
-            printf("5. Quit\n");
-        }
-        else if(position == LEADERBOARD){
-            printf("=== Menu ===\n");
-            printf("1. Start\n");
-            printf("2. Save\n");
-            printf("3. Leaderboard <-\n");
-            printf("4. Help\n");
-            printf("5. Quit\n");
+            printf("3. Help\n");
+            printf("4. Quit\n");
         }
         else if(position == HELP){
             printf("=== Menu ===\n");
             printf("1. Start\n");
             printf("2. Save\n");
-            printf("3. Leaderboard\n");
-            printf("4. Help <-\n");
-            printf("5. Quit\n");
+            printf("3. Help <-\n");
+            printf("4. Quit\n");
         }
         else if(position == QUIT){
             printf("=== Menu ===\n");
             printf("1. Start\n");
             printf("2. Save\n");
-            printf("3. Leaderboard\n");
-            printf("4. Help\n");
-            printf("5. Quit <-\n");
+            printf("3. Help\n");
+            printf("4. Quit <-\n");
         }
 
         choice = getch();
@@ -181,9 +168,6 @@ int main() {
     }
     else if(position == SAVE){
         saveDisplay();
-    }
-    else if(position == LEADERBOARD){
-        printf("Leaderboard selected\n");
     }
 
     else if(position == QUIT){

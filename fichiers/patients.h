@@ -52,6 +52,36 @@ qui va influencer la difficulté du niveau -> le temps d'attente pour le patient
 
 */ 
 
+void update_patients_waiting_room(int *next_patient, int chair_patient[4],
+                                   int *next_timer, Tray tray[4], PatientList *patientList) {
+    int free_chairs = 0;
+    for (int i = 0; i < 4; i++) {
+        if (chair_patient[i] == 0 && !tray[i].isDirty)
+            free_chairs++;
+    }
+    if (free_chairs == 0) return;
+
+    (*next_timer) -= 1 + free_chairs;
+
+    if (*next_timer <= 0) {
+        for (int i = 0; i < 4; i++) {
+            if (chair_patient[i] == 0 && !tray[i].isDirty) {
+                spawnNewPatient(patientList, i); // i = index chaise = index patient
+                chair_patient[i] = i + 1;        // i+1 pour éviter 0 (= chaise vide)
+                *next_timer = 150 + rand() % 20;
+                break;
+            }
+        }
+    }
+}
+
+void treat_patient(int chair_idx, int chair_patient[4], bool neat_chair[4]) {
+    if (chair_idx >= 0 && chair_idx <= 3 && chair_patient[chair_idx] != 0) {
+        chair_patient[chair_idx] = 0;
+        neat_chair[chair_idx] = true;
+    }
+}
+
 
 typedef struct {
     char    name[50];

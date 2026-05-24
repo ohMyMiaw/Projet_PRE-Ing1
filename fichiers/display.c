@@ -67,7 +67,7 @@ int getch_portable() {
     return ch;
 #endif
 }
-// les différentes structures utilisées pour l'affichage
+// ------------------------------------------------------------ LES STRUCTURES D'AFFICHAGE ------------------------------------------------------------
 
 
 typedef struct {
@@ -106,36 +106,13 @@ ToolType objectToTool(enum Object obj) {
 }
 
 
-void update_patients_waiting_room(int *next_patient, int chair_patient[4],
-                                   int *next_timer, Tray tray[4], PatientList *patientList) {
-    int free_chairs = 0;
-    for (int i = 0; i < 4; i++) {
-        if (chair_patient[i] == 0 && !tray[i].isDirty)
-            free_chairs++;
-    }
-    if (free_chairs == 0) return;
 
-    (*next_timer) -= 1 + free_chairs;
 
-    if (*next_timer <= 0) {
-        for (int i = 0; i < 4; i++) {
-            if (chair_patient[i] == 0 && !tray[i].isDirty) {
-                spawnNewPatient(patientList, i); // i = index chaise = index patient
-                chair_patient[i] = i + 1;        // i+1 pour éviter 0 (= chaise vide)
-                *next_timer = 150 + rand() % 20;
-                break;
-            }
-        }
-    }
-}
 
-void treat_patient(int chair_idx, int chair_patient[4], bool neat_chair[4]) {
-    if (chair_idx >= 0 && chair_idx <= 3 && chair_patient[chair_idx] != 0) {
-        chair_patient[chair_idx] = 0;
-        neat_chair[chair_idx] = true;
-    }
-}
 
+
+
+// ------------------------------------------------------------ PROCEDURE PRINCIPALE ------------------------------------------------------------
 void display(Player P1, PatientList patientList, int next_patient, int chair_patient[4], int next_timer, bool neat_chair[4], Tray tray[4], int furious_patient, int unsatisfied_patient, int satisfied_patient) {
     int c = 0; // pour stocker les entrées du joueur
     /* ici c était un char car x arrête le programme, mais pour les touches directionnelles, 
@@ -148,7 +125,7 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
 
 
 
-    // Initialisation de la grille et du joueur
+// ------------------------------------------------------------ POSITIONNEMENT DE LA GRILLE ------------------------------------------------------------
     Cells grid[M_HEIGHT][M_WIDTH] = {0}; // Exemple de grille 9x9
     grid[0][1].obj = GLOVES; // Placer des gants à la position (0,1)
     grid[0][2].obj = PROBE; // Placer une sonde à la position (0,2)
@@ -173,7 +150,7 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
 
 
 
-
+// ------------------------------------------------------------ BOUCLE PRINCIPALE ------------------------------------------------------------
     while (c != 'x') {
         for (int i = 0; i < 4; i++) {
             if (chair_patient[i] != 0) {
@@ -376,10 +353,10 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
     }
 
     
-    // 2. affichage
-    update_patients_waiting_room(&next_patient, chair_patient, &next_timer, tray, &patientList);
+    // ------------------------------------------------------------ AFFICHAGE ------------------------------------------------------------
 
-    // 2.1 affichage grille
+
+    update_patients_waiting_room(&next_patient, chair_patient, &next_timer, tray, &patientList);
     #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
@@ -418,7 +395,7 @@ void display(Player P1, PatientList patientList, int next_patient, int chair_pat
     printf("|   |   |   |T1 |   |T2 |   |   |   |   |   |\n");
     printf("----------------------------------------------\n");
 
-    //2.2 affichage infos des tools (à droite de la grille)
+// ------------------------------------------------------------ AFFICHAGE DES INFOS ------------------------------------------------------------
 
 printf("\e7");
 DisplayBase display1 = {1, 50};
@@ -455,7 +432,7 @@ for (int i = 0; i < 4; i++) {
 
 printf("\e8");
 
-// 2.3 affichage des symptomes de chaque patient avec tools colorés
+// ------------------------------------------------------------ AFFICHAGE DES PATIENTS ET SYMPTOMES ------------------------------------------------------------
 DisplayBase display_patients = {15, 2};
 printf("\e7");
 
@@ -521,12 +498,10 @@ for (int i = 0; i < 4; i++) {
 }
 
 printf("\e8");
-// 2.3 affichage dans la cellule (à droite de la grille)
-
-// 2.3 affichage des symptomes de chaque patient avec tools colorés
 
 
-// -----------------------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------ INFOS OUTILS ------------------------------------------------------------
 DisplayBase display2 = {1, 110};
 printf("\e7");
 
@@ -546,6 +521,7 @@ for (int z = 0; z < 8; z++) {
 printf("\e[%d;%dH", display2.row++, display2.col);
 printf("+========================================+");
 
+// ------------------------------------------------------------ SCORE ------------------------------------------------------------
 printf("\e8");
 
 DisplayBase display3 = {15, 110}; // a changer pour ne pas cacher les symptomes des patients dans la salle d'attente
@@ -594,7 +570,7 @@ printf("\e8");
     }
 
 
-    // Affichage game over
+// ------------------------------------------------------------ GAME OVER ------------------------------------------------------------
     if (furious_patient >= 3) {
         #ifdef _WIN32
             system("cls");
@@ -606,7 +582,7 @@ printf("\e8");
         printf("Final score: %d$\n\n", P1.moneySpent);
     }
 
-
+// ------------------------------------------------------------ INFORMATION DU JEU ------------------------------------------------------------
     GameState gs;
     gs.P1             = P1;
     gs.patientList    = patientList;
